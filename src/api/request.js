@@ -1,0 +1,273 @@
+import instance from './index.js'
+import md5 from 'js-md5'
+
+// 登录
+export const login = params => {
+  params.password = md5(params.password)
+  return instance.post('/account/login', params)
+}
+// 退出登录
+export const outLogin = () => {
+  return instance.post('/account/loginOut')
+}
+// 获取用户权限
+export const getPermissions = () => {
+  return instance.post('/permission/getPermissions')
+}
+// 获取初始权限和角色权限
+export const getInitPermissions = params => {
+  return instance.post('/permission/getInitializePermissions', params)
+}
+// 修改初始权限
+export const changeInitPermissions = params => {
+  return instance.post('/permission/initialize', params)
+}
+// 获取角色列表
+export const getRoleList = () => {
+  return instance.post('/role/getRoleList')
+}
+// 添加角色
+export const addRole = params => {
+  return instance.post('/role/addRole', params)
+}
+// 删除角色
+export const deleteRole = params => {
+  return instance.post('/role/delteRole', params)
+}
+// 修改角色
+export const changeRole = params => {
+  return instance.post('/role/updateRole/Permissions', params)
+}
+// 添加用户
+export const addUser = params => {
+  params.password = md5(params.password)
+  return instance.post('/cmsUser/addCmsUser', params)
+}
+// 根据角色ID查询用户
+export const queryUserById = params => {
+  return instance.post('/cmsUser/getCmsUserVoListByCmsRoleId', params)
+}
+// 用户信息
+export const getUserInfo = params => {
+  return instance.post('/cmsUser/getUserData', params)
+}
+// 超级管理员修改用户信息
+export const updateUserInfo = params => {
+  if (params.password === '') {
+    delete params.password
+  } else {
+    params.password = md5(params.password)
+  }
+  return instance.post('/cmsUser/updateCmsUser', params)
+}
+// 用户修改个人信息
+export const updateUserInfoBySelf = params => {
+  return instance.post('/cmsUser/updateCmsUserState', params)
+}
+// 超级管理员修改用户状态
+export const updateUserState = params => {
+  return instance.post('/cmsUser/updateCmsUserState', params)
+}
+// 删除用户
+export const deleteUser = params => {
+  return instance.post('/cmsUser/deleteCmsUserState', params)
+}
+/*
+* 商品模块接口
+* */
+// 添加商品
+export const addGoods = params => {
+  return instance.post('/goods/addGoods', params)
+}
+// 获取品牌列表
+export const getBrandList = params => {
+  return instance.post('/goods/getGoodsBrandList', params)
+}
+// 商品详情
+export const getGoodsDetail = params => {
+  return instance.post('/goods/getGoodsDetail', params)
+}
+// 获取商品列表
+export const getGoodsList = params => {
+  return instance.post('/goods/getGoodsList', params)
+}
+// 更新商品
+export const updateGoods = params => {
+  return instance.post('/goods/updateGoods', params)
+}
+// 更新商品状态
+export const updateGoodsStatus = params => {
+  return instance.post('/goods/updateGoodsState', params)
+}
+// 新增结构用户
+export const addOrganizeUser = params => {
+  return instance.post('/organize/addOrganize', params)
+}
+// 查询机构用户列表
+export const getOrganizeUserList = params => {
+  return instance.post('/organize/getOrganizeList', params)
+}
+// 更新机构用户
+export const updateOrganizeUser = params => {
+  return instance.post('/organize/updateOrganize', params)
+}
+// 经纪人列表
+export const getBrokerList = params => {
+  return instance.post('/agentMember/getAgentMemberList', params)
+}
+// 更新经纪人状态
+export const updateBrokerStatus = params => {
+  return instance.post('/agentMember/updateStatus', params)
+}
+// 添加供应商
+export const addSupplier = params => {
+  return instance.post('/supplier/addSupplier', params)
+}
+// 删除供应商
+export const deleteSupplier = params => {
+  return instance.post('/supplier/deleteSupplier', params)
+}
+// 供应商列表
+export const getSupplierList = params => {
+  return instance.post('/supplier/getSupplierList', params)
+}
+// 更新供应商
+export const updateSupplier = params => {
+  return instance.post('/supplier/updateSupplier', params)
+}
+// 添加集采商品
+export const addPurchaseGoods = params => {
+  return instance.post('/purchaseGoods/addPurchaseGoods', params)
+}
+// 集采商品详情
+export const getPurchaseGoodsDetail = params => {
+  return instance.post('/purchaseGoods/getPurchaseGoodsDetail', params)
+}
+// 集采商品列表
+export const getPurchaseGoodsList = params => {
+  return instance.post('/purchaseGoods/getPurchaseGoodsList', params)
+}
+// 更新集采商品
+export const updatePurchaseGoods = params => {
+  return instance.post('/purchaseGoods/updatePurchaseGoods', params)
+}
+// 更新集采商品状态
+export const updatePurchaseGoodsStatus = params => {
+  return instance.post('/purchaseGoods/updateState', params)
+}
+// 添加活动
+export const addActive = params => {
+  return instance.post('/activity/addActivity', params)
+}
+// 活动列表
+export const getActiveList = params => {
+  return instance.post('/activity/getActivityList', params)
+}
+// 更新活动
+export const updateActive = params => {
+  return instance.post('/activity/updateActivity', params)
+}
+// 更新活动状态
+export const updateActiveStatus = params => {
+  return instance.post('/activity/updateStatus', params)
+}
+// 关闭订单
+export const closeOrder = params => {
+  return instance.post('/purchaseOrder/closeOrder', params)
+}
+// 订单详情
+export const orderDetail = params => {
+  return instance.post('/purchaseOrder/getPurchaseOrderDetail', params)
+}
+// 采购订单列表
+export const getOrderList = params => {
+  return instance.post('/purchaseOrder/getPurchaseOrderList', params)
+}
+// 批量发货
+export const sendOrder = params => {
+  return instance.post('/purchaseOrder/sendGoods', params)
+}
+// 添加公司
+export const addCompany = params => {
+  return instance.post('/company/addCompany', params)
+}
+// 删除公司
+export const deleteCompany = params => {
+  return instance.post('/company/deleteCompany', params)
+}
+// 公司列表
+export const companyList = params => {
+  return instance.post('/company/getCompanyList', params)
+}
+// 更新公司
+export const updateCompany = params => {
+  return instance.post('/company/updateCompany', params)
+}
+// 添加运营部
+export const addSaleDepartment = params => {
+  return instance.post('/saleDepartment/addSaleDepartment', params)
+}
+// 删除运营部
+export const deleteSaleDepartment = params => {
+  return instance.post('/saleDepartment/deleteSaleDepartment', params)
+}
+// 运营部列表
+export const getSaleDepartmentList = params => {
+  return instance.post('/saleDepartment/getSaleDepartmentList', params)
+}
+// 更新运营部
+export const updateSaleDepartment = params => {
+  return instance.post('/saleDepartment/updateSaleDepartment', params)
+}
+export const baseGoods = {
+  addGoods,
+  getBrandList,
+  getGoodsDetail,
+  getGoodsList,
+  updateGoods,
+  updateGoodsStatus
+}
+export const organizeUser = {
+  addOrganizeUser,
+  getOrganizeUserList,
+  updateOrganizeUser
+}
+export const broker = {
+  getBrokerList,
+  updateBrokerStatus
+}
+export const supplierManager = {
+  updateSupplier,
+  getSupplierList,
+  deleteSupplier,
+  addSupplier
+}
+export const collectGoods = {
+  addPurchaseGoods,
+  getPurchaseGoodsDetail,
+  getPurchaseGoodsList,
+  updatePurchaseGoods,
+  updatePurchaseGoodsStatus
+}
+export const activeList = {
+  addActive,
+  getActiveList,
+  updateActive,
+  updateActiveStatus
+}
+export const allOrder = {
+  closeOrder,
+  orderDetail,
+  getOrderList,
+  sendOrder
+}
+export const organizeMnager = {
+  addCompany,
+  deleteCompany,
+  companyList,
+  updateCompany,
+  addSaleDepartment,
+  deleteSaleDepartment,
+  getSaleDepartmentList,
+  updateSaleDepartment
+}
