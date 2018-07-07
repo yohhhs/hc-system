@@ -1,13 +1,13 @@
 <template>
   <div class="organize-edit">
     <div class="modal-input-item">
-      <p class="label">公司名称</p>
+      <p class="label">分公司名称</p>
       <div style="width: 350px">
         <Input type="text" long v-model.trim="companyName" placeholder="请输入分公司名称" />
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">公司简介</p>
+      <p class="label">分公司简介</p>
       <div style="width: 350px">
         <Input type="textarea" long :rows="2" v-model.trim="companyProfile" placeholder="请输入公司简介" />
       </div>
@@ -27,8 +27,11 @@
           <Select style="width: 180px;margin-right: 10px" v-model="cProvinceId" :label-in-value="true" placeholder="选择省份" clearable @on-change="provinceChange">
             <Option v-for="item in selectProvinceList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
-          <Select style="width: 180px;margin-right: 10px" v-model="cCityId" :label-in-value="true" placeholder="选择城市" clearable @on-change="cityChange">
+          <Select v-if="editType !== 1" style="width: 180px;margin-right: 10px" v-model="cCityId" :label-in-value="true" placeholder="选择城市" clearable @on-change="cityChange">
             <Option v-for="item in selectCityList" :value="item.code" :key="item.code">{{ item.name }}</Option>
+          </Select>
+          <Select v-if="editType === 3" style="width: 180px" v-model="cAreaId" :label-in-value="true" placeholder="选择区县" clearable @on-change="areaChange">
+            <Option v-for="item in selectDistrictList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
         </div>
       </div>
@@ -99,7 +102,17 @@
             value: this.detail.cityCode
           }
           this.cCityId = this.detail.cityCode
+          if (this.editType === 3) {
+            this.selectDistrictList = this.selectCityList.find(item => {
+              return item.code === this.detail.cityCode
+            }).children
+          }
         }
+        if (this.editType === 3) {
+
+        }
+        this.currentArea = this.detail
+        this.cAreaId = this.detail
         this.companyName = this.detail.companyName
         this.companyProfile = this.detail.companyProfile
         this.organizeId = this.detail.organizeId
@@ -127,6 +140,18 @@
       },
       cityChange (selection) {
         this.currentCity = selection
+        if (selection) {
+          this.selectDistrictList = this.selectCityList.find(item => {
+            return item.code === selection.value
+          }).children
+        } else {
+          this.currentArea = null
+          this.selectDistrictList = []
+          this.cAreaId = ''
+        }
+      },
+      areaChange (selection) {
+        this.currentArea = selection
       },
       returnData () {
         if (this.companyName === '') {
@@ -151,8 +176,6 @@
           companyProfile: this.companyProfile,
           provinceCode: this.currentProvince.value,
           provinceName: this.currentProvince.label,
-          cityCode: this.currentCity.value || '',
-          cityName: this.currentCity.label || '',
           remark: this.remark,
           parentId: 0
         }

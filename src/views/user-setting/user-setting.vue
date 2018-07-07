@@ -11,9 +11,8 @@
     <Table
       :columns="userTable.columns"
       :loading="userTable.loading"
-      highlight-row
       :data="userTable.data"
-      @on-row-click="clickSingle">
+      @on-selection-change="tableSelectChange">
     </Table>
     <Modal
       v-model="addUser.modal"
@@ -22,8 +21,8 @@
       title="添加用户">
       <Input :style="modleStyle" v-model="addUser.phone" placeholder="请输入手机号" />
       <Input :style="modleStyle" type="password" v-model="addUser.password" placeholder="请输入密码" />
-      <Input :style="modleStyle" v-model="addUser.nickName" placeholder="请输入昵称" />
-      <Select v-model="addUser.roleId">
+      <Input :style="modleStyle" v-model="addUser.name" placeholder="请输入使用者姓名" />
+      <Select v-model="addUser.bCmsRoleId">
         <Option v-for="item in roleList" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
       <div slot="footer">
@@ -36,8 +35,8 @@
       @on-cancel="writeUserCancel"
       title="修改用户">
       <Input :style="modleStyle" type="password" v-model="writeUser.password" placeholder="请输入密码" />
-      <Input :style="modleStyle" v-model="writeUser.nickName" placeholder="请输入昵称" />
-      <Select v-model="writeUser.roleId">
+      <Input :style="modleStyle" v-model="writeUser.name" placeholder="请输入使用者姓名" />
+      <Select v-model="writeUser.bCmsRoleId">
         <Option v-for="item in roleList" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
       <div slot="footer">
@@ -67,21 +66,22 @@ export default {
       inputStyle: 'width: 200px; margin: 10px 0;',
       modleStyle: 'margin-bottom: 15px',
       currentUserIndex: -1,
-      currentUser: null,
+      currentUser: [],
       isDelete: false,
+      currentId: '',
       addUser: {
         modal: false,
         password: '',
         phone: '',
-        roleId: '',
-        nickName: '',
+        bCmsRoleId: '',
+        name: '',
         loading: false
       },
       writeUser: {
         modal: false,
         password: '',
-        roleId: '',
-        nickName: '',
+        bCmsRoleId: '',
+        name: '',
         loading: false
       },
       userTable: {
@@ -97,7 +97,7 @@ export default {
           },
           {
             title: '使用者姓名',
-            key: 'phone'
+            key: 'cmsUserName'
           },
           {
             title: '使用者电话',
@@ -109,7 +109,28 @@ export default {
           },
           {
             title: '操作',
-            key: 'name'
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'warning',
+                    size: 'small'
+                  },
+                  style: {
+                    margin: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.writeUser.modal = true
+                      this.currentId = params.row.id
+                      this.writeUser.password = ''
+                      this.writeUser.name = params.row.cmsUserName
+                      this.writeUser.bCmsRoleId = params.row.cmsRoleId
+                    }
+                  }
+                }, '编辑')
+              ])
+            }
           }
         ],
         data: [],
@@ -154,36 +175,21 @@ export default {
         case '添加':
           this.addUser.modal = true
           break
-        case '编辑':
-          if (!this.currentUser) {
-            return this.warningInfo('请选择一条用户信息')
-          }
-          this.writeUser.modal = true
-          this.writeUser.password = ''
-          this.writeUser.nickName = this.currentUser.cmsUserName
-          this.writeUser.roleId = this.currentUser.cmsRoleId
-          break
         case '删除':
-          if (!this.currentUser) {
+          if (this.currentUser.length === 0) {
             return this.warningInfo('请选择一条用户信息')
           }
-          if (this.isDelete) {
-            return
-          }
-          this.isDelete = true
           deleteUser({
-            id: this.currentUser.id
+            id: this.currentUser.toString()
           })
             .then(data => {
               if (data !== 'isError') {
                 this.successInfo('删除用户成功')
                 this.getUserList()
-                this.currentUser = null
+                this.currentUser = []
               }
-              this.isDelete = false
             })
             .catch(err => {
-              this.isDelete = false
             })
           break
       }
@@ -191,8 +197,8 @@ export default {
     addUserQuery() {
       let phone = this.addUser.phone
       let password = this.addUser.password
-      let bCmsRoleId = this.addUser.roleId
-      let name = this.addUser.nickName
+      let bCmsRoleId = this.addUser.bCmsRoleId
+      let name = this.addUser.name
       if (phone === '' && password === '' && bCmsRoleId === '' && name === '') {
         return this.warningInfo('内容不能为空')
       }
@@ -225,14 +231,14 @@ export default {
     clearAddUserData() {
       this.addUser.phone = ''
       this.addUser.password = ''
-      this.addUser.roleId = ''
+      this.addUser.bCmsRoleId = ''
       this.addUser.nickName = ''
     },
     writeUserQuery() {
       let password = this.writeUser.password
-      let bCmsRoleId = this.writeUser.roleId
-      let name = this.writeUser.nickName
-      let id = this.currentUser.id
+      let bCmsRoleId = this.writeUser.bCmsRoleId
+      let name = this.writeUser.name
+      let id = this.currentId
       if (name === '') {
         return this.warningInfo('名称不能为空')
       }
@@ -247,11 +253,9 @@ export default {
         name
       })
         .then(data => {
-          console.log(data)
           if (data !== 'isError') {
             this.successInfo('修改用户信息成功')
             this.getUserList()
-            this.currentUser = null
             this.writeUser.modal = false
           }
           this.writeUser.loading = false
@@ -260,9 +264,12 @@ export default {
           this.writeUser.loading = false
         })
     },
-    clickSingle(row, i) {
-      this.currentUser = row
-      this.currentUserIndex = i
+    tableSelectChange(selection) {
+      let ids = []
+      selection.forEach(item => {
+        ids.push(item.id)
+      })
+      this.currentUser = ids
     },
     addUserCancel() {
       this.clearAddUserData()

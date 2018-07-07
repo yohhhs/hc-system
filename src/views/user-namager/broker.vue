@@ -18,16 +18,16 @@
       </Select>
     </query-wrapper>
     <btn-wrapper @btnClick="btnClick"></btn-wrapper>
-    <Table :columns="tableColumns" :loading="tableLoading" :data="tableData"></Table>
+    <Table :columns="tableColumns" :loading="tableLoading" :data="tableData" @on-selection-change="tableSelectChange"></Table>
     <Page style="margin-top: 20px;text-align: center;" :current="pageNo" :total="total" show-elevator @on-change='changePage'></Page>
-    <Modal
+    <!--<Modal
       v-model="writeModal.isShow"
       :mask-closable="false"
       title="">
       <div slot="footer">
         <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
       </div>
-    </Modal>
+    </Modal>-->
   </div>
 </template>
 <script>
@@ -64,6 +64,7 @@
           memberType: '',
           status: ''
         },
+        memberIds: [],
         tableColumns: [
           {
             type: 'selection',
@@ -137,10 +138,34 @@
       btnClick (handleName) {
         switch (handleName) {
           case '激活':
+            this.updateStatus(1)
             break
           case '锁定':
+            this.updateStatus(0)
             break
         }
+      },
+      updateStatus (status) {
+        if (this.memberIds.length === 0) {
+          return this.warningInfo('请选择操作对象')
+        }
+        broker.updateBrokerStatus({
+          agentMemberId: this.memberIds.toString(),
+          status
+        }).then(data => {
+          if (data !== 'isError') {
+            this.successInfo('更新成功')
+            this.getBrokerList()
+            this.memberIds = []
+          }
+        })
+      },
+      tableSelectChange (selection) {
+        let ids = []
+        selection.forEach(item => {
+          ids.push(item.agentMemberId)
+        })
+        this.memberIds = ids
       },
       queryStartChange (time) {
         this.queryArgs.registerStartTime = time
@@ -155,8 +180,7 @@
       changePage (no) {
         this.pageNo = no
         this.getBrokerList()
-      },
-      writeConfirm () {}
+      }
     }
   }
 </script>

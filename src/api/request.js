@@ -261,7 +261,7 @@ export const allOrder = {
   getOrderList,
   sendOrder
 }
-export const organizeMnager = {
+export const organizeManager = {
   addCompany,
   deleteCompany,
   companyList,
@@ -269,5 +269,6 @@ export const organizeMnager = {
   addSaleDepartment,
   deleteSaleDepartment,
   getSaleDepartmentList,
-  updateSaleDepartment
+  updateSaleDepartment,
+  getOrganizeUserList
 }

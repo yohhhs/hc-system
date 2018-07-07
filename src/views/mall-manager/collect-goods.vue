@@ -18,7 +18,7 @@
           class="query-item"
           type="datetime" placeholder="集采结束时间"
           clearable @on-change="purchaseEndChange"></DatePicker>
-        <Select class="query-item" v-model="queryArgs.goodsState">
+        <Select class="query-item" v-model="queryArgs.goodsState" placeholder="商品状态">
           <Option v-for="item in statusList" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </query-wrapper>
@@ -53,6 +53,7 @@
   export default {
     data () {
       return {
+        selectIds: [],
         statusList: [
           {
             id: 1,
@@ -187,11 +188,13 @@
             this.openAddModal()
             break
           case '上架商品':
+            this.updateStatus(1)
             break
           case '下架商品':
+            this.updateStatus(0)
             break
         }
-      } ,
+      },
       queryList () {
         this.pageNo = 1
         this.getPurchaseGoodsList()
@@ -200,10 +203,29 @@
         this.pageNo = no
         this.getPurchaseGoodsList()
       },
+      updateStatus (state) {
+        if (this.selectIds.length === 0) {
+          return this.warningInfo('请选择操作对象')
+        }
+        collectGoods.updatePurchaseGoodsStatus({
+          purchaseGoodsId: this.selectIds.toString(),
+          state
+        }).then(data => {
+          if (data !== 'isError') {
+            this.successInfo('更新成功')
+            this.getPurchaseGoodsList()
+            this.selectIds = []
+          }
+        })
+      },
       addConfirm () {},
       writeConfirm () {},
       tableSelectChange (selection) {
-
+        let ids = []
+        selection.forEach(item => {
+          ids.push(item.purchaseGoodsId)
+        })
+        this.selectIds = ids
       }
     }
   }

@@ -8,7 +8,7 @@
         <!--<div @click="switchMenu" style="height: 100%;width: 60px;display: inline-block;text-align: center;line-height: 70px;vertical-align: middle;cursor: pointer" :style="{transform : menuShrink ? 'rotateZ(90deg)' : 'rotateZ(0deg)'}">
           <Icon type="navicon" size="32"></Icon>
         </div>-->
-        <span style="line-height:60px;font-size: 28px;">汇客后台管理系统</span>
+        <span style="line-height:60px;font-size: 28px;">金牌助手后台管理系统</span>
         <Button style="float: right;margin-top: 14px;margin-right: 28px;" type="error" @click="loginOut">账号退出</Button>
         <span style="float: right;line-height: 60px;margin-right: 28px;">您好，管理员：admin</span>
       </div>
