@@ -1,39 +1,37 @@
 <template>
   <div class="organize-edit">
     <div class="modal-input-item">
-      <p class="label">分公司名称</p>
+      <p class="label">营业部名称</p>
       <div style="width: 350px">
-        <Input type="text" long v-model.trim="companyName" placeholder="请输入分公司名称" />
+        <Input type="text" long v-model.trim="saleDepartmentName" placeholder="请输入营业部名称" />
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">分公司简介</p>
-      <div style="width: 350px">
-        <Input type="textarea" long :rows="2" v-model.trim="companyProfile" placeholder="请输入公司简介" />
-      </div>
-    </div>
-    <div class="modal-input-item">
-      <p class="label">所属机构</p>
-      <div style="width: 350px">
-        <Select v-model="organizeId" placeholder="选择所属机构" clearable>
-          <Option v-for="item in organizeList" :value="item.organizeId" :key="item.organizeId">{{ item.organizeName }}</Option>
-        </Select>
-      </div>
-    </div>
-    <div class="modal-input-item">
-      <p class="label">所在地</p>
+      <p class="label">地址</p>
       <div>
         <div style="display: flex;">
           <Select style="width: 180px;margin-right: 10px" v-model="cProvinceId" :label-in-value="true" placeholder="选择省份" clearable @on-change="provinceChange">
             <Option v-for="item in selectProvinceList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
-          <Select v-if="editType !== 1" style="width: 180px;margin-right: 10px" v-model="cCityId" :label-in-value="true" placeholder="选择城市" clearable @on-change="cityChange">
+          <Select style="width: 180px;margin-right: 10px" v-model="cCityId" :label-in-value="true" placeholder="选择城市" clearable @on-change="cityChange">
             <Option v-for="item in selectCityList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
-          <Select v-if="editType === 3" style="width: 180px" v-model="cAreaId" :label-in-value="true" placeholder="选择区县" clearable @on-change="areaChange">
+          <Select style="width: 180px" v-model="cAreaId" :label-in-value="true" placeholder="选择区县" clearable @on-change="areaChange">
             <Option v-for="item in selectDistrictList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
         </div>
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label">详细地址</p>
+      <div style="width: 560px">
+        <Input type="text" long v-model.trim="addressDetail" placeholder="请输入详细地址" />
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label">邮编</p>
+      <div style="width: 560px">
+        <Input type="text" long v-model.trim="postCode" placeholder="请输入邮编" />
       </div>
     </div>
     <div class="modal-input-item">
@@ -50,14 +48,6 @@
 
   export default {
     props: {
-      editType: {
-        type: Number,
-        default: 1
-      },
-      organizeList: {
-        type: Array,
-        default: []
-      },
       isWrite: {
         type: Boolean,
         default: false
@@ -69,6 +59,9 @@
     },
     data () {
       return {
+        saleDepartmentName: '',
+        postCode: '',
+        addressDetail: '',
         selectProvinceList: cityDatas,
         selectCityList: [],
         selectDistrictList: [],
@@ -78,53 +71,42 @@
         cProvinceId: '',
         cCityId: '',
         cAreaId: '',
-        companyName: '',
-        companyProfile: '',
-        organizeId: '',
         remark: ''
       }
     },
     components: {},
     mixins: [message],
-    created () {
+    mounted () {
       if (this.isWrite) {
+        this.saleDepartmentName = this.detail.saleDepartmentName
+        this.postCode = this.detail.postCode
+        this.remark = this.detail.remark
+        this.addressDetail = this.detail.addressDetail
+        this.cAreaId = this.detail.provinceCode
+        this.cCityId = this.detail.cityCode
+        this.cProvinceId = this.detail.districtCode
         this.currentProvince = {
           label: this.detail.provinceName,
           value: this.detail.provinceCode
         }
-        this.cProvinceId = this.detail.provinceCode
+        console.log(this.detail.provinceCode)
         this.selectCityList = cityDatas.find(item => {
           return item.code === this.detail.provinceCode
         }).children
-        if (this.detail.cityCode) {
+        if (this.detail.cityCode !== '') {
           this.currentCity = {
             label: this.detail.cityName,
             value: this.detail.cityCode
           }
-          this.cCityId = this.detail.cityCode
-          if (this.editType === 3) {
-            this.selectDistrictList = this.selectCityList.find(item => {
-              return item.code === this.detail.cityCode
-            }).children
-          }
+          this.selectDistrictList = this.selectCityList.find(item => {
+            return item.code === this.detail.cityCode
+          }).children
         }
-        if (this.editType === 3) {
-
-        }
-        this.currentArea = this.detail
-        this.cAreaId = this.detail
-        this.companyName = this.detail.companyName
-        this.companyProfile = this.detail.companyProfile
-        this.organizeId = this.detail.organizeId
-        this.remark = this.detail.remark
       }
     },
     methods: {
       provinceChange (selection) {
         this.currentProvince = selection
-        if (this.editType === 1) {
-          return
-        }
         if (selection) {
           this.selectCityList = cityDatas.find(item => {
             return item.code === selection.value
@@ -154,30 +136,34 @@
         this.currentArea = selection
       },
       returnData () {
-        if (this.companyName === '') {
-          this.warningInfo('请输入公司名称')
-          return false
-        }
-        if (this.companyProfile === '') {
-          this.warningInfo('请输入公司简介')
-          return false
-        }
-        if (this.organizeId === '') {
-          this.warningInfo('请选择所属机构')
+        if (this.saleDepartmentName === '') {
+          this.warningInfo('请输入营业部名称')
           return false
         }
         if (!this.currentProvince) {
           this.warningInfo('请选择城市')
           return false
         }
+        if (this.addressDetail === '') {
+          this.warningInfo('请输入详细地址')
+          return false
+        }
+        if (this.postCode === '') {
+          this.warningInfo('请输入邮编')
+          return false
+        }
         return {
-          organizeId: this.organizeId,
-          companyName: this.companyName,
+          saleDepartmentName: this.saleDepartmentName,
           companyProfile: this.companyProfile,
           provinceCode: this.currentProvince.value,
           provinceName: this.currentProvince.label,
-          remark: this.remark,
-          parentId: 0
+          cityCode: this.currentCity.value || '',
+          cityName: this.currentCity.label || '',
+          districtCode: this.currentArea.value || '',
+          districtName: this.currentArea.label || '',
+          postCode: this.postCode,
+          addressDetail: this.addressDetail,
+          remark: this.remark
         }
       }
     }

@@ -219,6 +219,22 @@ export const getSaleDepartmentList = params => {
 export const updateSaleDepartment = params => {
   return instance.post('/saleDepartment/updateSaleDepartment', params)
 }
+// 添加内勤人员
+export const addInside = params => {
+  return instance.post('/insideMember/addInsideMemberList', params)
+}
+// 内勤人员列表
+export const getInsideList = params => {
+  return instance.post('/insideMember/getInsideMemberList', params)
+}
+// 更新内勤人员
+export const updateInside = params => {
+  return instance.post('/insideMember/updateInsideMemberList', params)
+}
+// 更新内勤人员状态
+export const updateInsideStatus = params => {
+  return instance.post('/insideMember/updateStatus', params)
+}
 export const baseGoods = {
   addGoods,
   getBrandList,
@@ -271,4 +287,10 @@ export const organizeManager = {
   getSaleDepartmentList,
   updateSaleDepartment,
   getOrganizeUserList
+}
+export const insideUser = {
+  addInside,
+  getInsideList,
+  updateInside,
+  updateInsideStatus
 }

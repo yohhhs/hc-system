@@ -1,57 +1,65 @@
 <template>
-    <div class="organize-manager">
-      <btn-wrapper @btnClick="btnClick"></btn-wrapper>
-      <div class="organize-wrapper">
-        <Tree :data="organizeData"  :load-data="loadData" :render="renderContent"></Tree>
-      </div>
-      <Modal
-        v-model="addModal.isShow"
-        :mask-closable="false"
-        width="800"
-        title="添加">
-          <organize-edit v-if="addModal.isShow" ref='addEdit' :organizeList="organizeList"></organize-edit>
-          <div slot="footer">
-            <Button type="primary" size="large" long :loading="addModal.loading"  @click="addConfirm">确定</Button>
-           </div>
-      </Modal>
-      <!--<Modal
-        v-model="writeModal.isShow"
-        :mask-closable="false"
-        title="修改">
-        <organize-edit v-if="addModal.isShow" ref='addEdit' :organizeList="organizeList" :isWrite="true"></organize-edit>
-        <div slot="footer">
-          <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
-        </div>
-      </Modal>-->
+  <div class="organize-manager">
+    <!--<btn-wrapper @btnClick="btnClick"></btn-wrapper>-->
+    <div class="organize-wrapper">
+      <Tree :data="organizeData" :load-data="loadData" :render="renderContent"></Tree>
     </div>
+    <Modal
+      v-model="addModal.isShow"
+      :mask-closable="false"
+      width="800"
+      title="添加">
+      <organize-edit v-if="addModal.isShow && editType !== 3" :editType="editType" ref='addEdit'></organize-edit>
+      <department-edit v-if="addModal.isShow && editType === 3" ref="addSale"></department-edit>
+      <div slot="footer">
+        <Button type="primary" size="large" long :loading="addModal.loading" @click="addConfirm">确定</Button>
+      </div>
+    </Modal>
+
+    <Modal
+      v-model="writeModal.isShow"
+      :mask-closable="false"
+      width="800"
+      title="修改">
+      <organize-edit v-if="writeModal.isShow && editType !== 3" ref='writeEdit' :isWrite="true" :detail="currentNode.data"></organize-edit>
+      <department-edit v-if="writeModal.isShow && editType === 3" ref="writeSale" :isWrite="true" :detail="currentNode.data"></department-edit>
+      <div slot="footer">
+        <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
+      </div>
+    </Modal>
+  </div>
 </template>
 <script>
   import btnWrapper from '@/components/btn-wrapper'
   import organizeEdit from './components/organize-edit'
-  import { organizeManager } from '@/api/request'
+  import departmentEdit from './components/department-edit'
+  import {organizeManager} from '@/api/request'
   import {message, addModal, writeModal} from '@/common/js/mixins'
 
   export default {
-    data () {
+    data() {
       return {
+        editType: 1,
         organizeList: [],
         organizeData: [],
         buttonProps: {
           type: 'ghost',
           size: 'small',
-        }
+        },
+        currentNode: null
       }
     },
     components: {
       btnWrapper,
-      organizeEdit
+      organizeEdit,
+      departmentEdit
     },
     mixins: [message, addModal, writeModal],
-    created () {
+    created() {
       this.getOrganizeList()
     },
     methods: {
-      getOrganizeList () {
+      getOrganizeList() {
         organizeManager.getOrganizeUserList({
           pageNo: 1,
           pageSize: 100
@@ -62,9 +70,10 @@
           }
         })
       },
-      btnClick (handleName) {
+      btnClick(handleName) {
         switch (handleName) {
           case '新增分公司':
+            this.editType = 1
             this.openAddModal()
             break
           case '新增市级子公司':
@@ -73,21 +82,55 @@
             break
         }
       },
-      writeConfirm () {
+      writeConfirm() {
 
       },
-      addConfirm () {
-        let returnData = this.$refs.addEdit.returnData()
-        if (returnData) {
-          organizeManager.addCompany({
-            ...returnData
-          }).then(data => {
-            if (data !== 'isError') {
-              this.successInfo('添加成功')
-              this.closeAddModal()
+      addConfirm() {
+        if (this.editType === 3) {
+          let returnData = this.$refs.addSale.returnData()
+          if (returnData) {
+            returnData.companyId = this.currentNode.data.companyId
+            organizeManager.addSaleDepartment({
+              ...returnData
+            }).then(data => {
+              if (data !== 'isError') {
+                this.successInfo('添加成功')
+                this.addNode()
+                this.closeAddModal()
+              }
+            })
+          }
+        } else {
+          let returnData = this.$refs.addEdit.returnData()
+          if (returnData) {
+            if (this.editType === 2) {
+              returnData.parentId = this.currentNode.data.companyId
+            } else {
+              returnData.parentId = 0
             }
-          })
+            returnData.organizeId = this.currentNode.data.organizeId
+            organizeManager.addCompany({
+              ...returnData
+            }).then(data => {
+              if (data !== 'isError') {
+                this.successInfo('添加成功')
+                this.addNode()
+                this.closeAddModal()
+                /*if (this.editType === 2) {
+                  const children = this.currentNode.data.children || [];
+                  children.push({
+                    title: data.companyName,
+                    loading: false,
+                    data: data,
+                    children: []
+                  });
+                  this.$set(this.currentNode, 'children', children);
+                }*/
+              }
+            })
+          }
         }
+
       },
       renderContent(h, {root, node, data}) {
         return h('span', {
@@ -117,7 +160,8 @@
               },
               on: {
                 click: () => {
-                  this.writeItem(data)
+                  this.editType = 2
+                  this.addChildCompany(data)
                 }
               }
             }, '添加子公司'),
@@ -131,7 +175,9 @@
               },
               on: {
                 click: () => {
-                  this.writeItem(data)
+                  this.editType = 3
+                  this.currentNode = data
+                  this.openAddModal()
                 }
               }
             }, '添加营业部'),
@@ -145,7 +191,7 @@
               },
               on: {
                 click: () => {
-                  this.writeItem(data)
+                  console.log(data.data.parentId)
                 }
               }
             }, '编辑'),
@@ -156,14 +202,15 @@
               },
               on: {
                 click: () => {
-                  this.remove(root, node, data)
+                  this.removeCompany(root, node, data)
                 }
               }
             }, '删除')
           ])
         ]);
       },
-      topRenderContent (h, {root, node, data}) {
+      renderSaleDepartmentContent(h, {root, node, data}) {
+        let info = data.data
         return h('span', {
           style: {
             display: 'inline-block',
@@ -173,36 +220,143 @@
         }, [
           h('span', [
             h('span', data.title)
+          ]),
+          h('span', [
+            h('span', {
+              style: {
+                marginLeft: '20px'
+              }
+            }, `${info.provinceName} ${info.cityName} ${info.districtName} ${info.addressDetail} ${info.postCode}`)
+          ]),
+          h('span', {
+            style: {
+              display: 'inline-block',
+              float: 'right',
+              marginRight: '32px'
+            }
+          }, [
+            h('Button', {
+              props: {
+                type: 'warning',
+                size: 'small'
+              },
+              style: {
+                marginRight: '8px'
+              },
+              on: {
+                click: () => {
+                  this.editType = 3
+                  this.currentNode = data
+                  this.openWriteModal()
+                }
+              }
+            }, '编辑'),
+            h('Button', {
+              props: {
+                type: 'error',
+                size: 'small'
+              },
+              on: {
+                click: () => {
+                  this.removeSaleDepartment(root, node, data)
+                }
+              }
+            }, '删除')
+          ])
+        ]);
+      },
+      topRenderContent(h, {root, node, data}) {
+        return h('span', {
+          style: {
+            display: 'inline-block',
+            width: '100%',
+            fontSize: '14px'
+          }
+        }, [
+          h('span', [
+            h('span', data.title)
+          ]),
+          h('span', {
+            style: {
+              display: 'inline-block',
+              float: 'right',
+              marginRight: '32px'
+            }
+          }, [
+            h('Button', {
+              props: {
+                type: 'warning',
+                size: 'small'
+              },
+              style: {
+                marginRight: '8px'
+              },
+              on: {
+                click: () => {
+                  this.editType = 1
+                  this.currentNode = data
+                  this.openAddModal()
+                }
+              }
+            }, '添加分公司')
           ])
         ])
       },
-      writeItem(data) {
-        console.log(data.dd)
-        data.title = 1
-        const children = data.children || [];
-        children.push({
-          title: 'appended node',
-          expand: true
-        });
-        this.$set(data, 'children', children);
+      addChildCompany(data) {
+        this.currentNode = data
+        this.editType = 2
+        this.openAddModal()
       },
-      remove(root, node, data) {
-        console.log(root)
-        return
-        const parentKey = root.find(el => el === node).parent;
-        const parent = root.find(el => el.nodeKey === parentKey).node;
-        const index = parent.children.indexOf(data);
-        parent.children.splice(index, 1);
+      removeCompany(root, node, data) {
+        this.$Modal.confirm({
+          content: '确定要删除吗？',
+          loading: true,
+          onOk: () => {
+            const parentKey = root.find(el => el === node).parent;
+            const parent = root.find(el => el.nodeKey === parentKey).node;
+            const index = parent.children.indexOf(data);
+            organizeManager.deleteCompany({
+              companyId: data.data.companyId
+            }).then(data => {
+              this.$Modal.remove()
+              if (data !== 'isError') {
+                this.successInfo('删除成功')
+                parent.children.splice(index, 1);
+              }
+            })
+          }
+        })
       },
-      loadData (item, callback) {
+      removeSaleDepartment(root, node, data) {
+        this.$Modal.confirm({
+          content: '确定要删除吗？',
+          loading: true,
+          onOk: () => {
+            const parentKey = root.find(el => el === node).parent;
+            const parent = root.find(el => el.nodeKey === parentKey).node;
+            const index = parent.children.indexOf(data);
+            console.log(index)
+            organizeManager.deleteSaleDepartment({
+              saleDepartmentId: data.data.saleDepartmentId
+            }).then(data => {
+              this.$Modal.remove()
+              if (data !== 'isError') {
+                this.successInfo('删除成功')
+                parent.children.splice(index, 1);
+              }
+            })
+          }
+        })
+      },
+      loadData(item, callback) {
         let organizeId = ''
         let parentId = ''
         let isTop = false
+        organizeId = item.data.organizeId
         if (item.data.companyId) {
           parentId = item.data.companyId
         } else {
           isTop = true
-          organizeId = item.data.organizeId
           parentId = 0
         }
         let children = []
@@ -231,8 +385,8 @@
                   children.push(
                     {
                       title: item.saleDepartmentName,
-                      loading: false,
-                      data: item
+                      data: item,
+                      render: this.renderSaleDepartmentContent
                     }
                   )
                 })
@@ -250,7 +404,7 @@
           }
         })
       },
-      getInitOranizeData () {
+      getInitOranizeData() {
         let init = []
         this.organizeList.forEach(item => {
           init.push(
@@ -264,6 +418,56 @@
           )
         })
         this.organizeData = init
+      },
+      addNode () {
+        let organizeId = ''
+        let parentId = ''
+        let isTop = false
+        organizeId = this.currentNode.data.organizeId
+        if (this.currentNode.data.companyId) {
+          parentId = this.currentNode.data.companyId
+        } else {
+          isTop = true
+          parentId = 0
+        }
+        let children = []
+        organizeManager.companyList({
+          organizeId,
+          parentId
+        }).then(data => {
+          if (data !== 'isError') {
+            data.forEach(item => {
+              children.push(
+                {
+                  title: item.companyName,
+                  loading: false,
+                  data: item,
+                  children: []
+                }
+              )
+            })
+          }
+          if (!isTop) {
+            organizeManager.getSaleDepartmentList({
+              companyId: this.currentNode.data.companyId
+            }).then(data => {
+              if (data !== 'isError') {
+                data.forEach(item => {
+                  children.push(
+                    {
+                      title: item.saleDepartmentName,
+                      data: item,
+                      render: this.renderSaleDepartmentContent
+                    }
+                  )
+                })
+                this.$set(this.currentNode, 'children', children);
+              }
+            })
+          } else {
+            this.$set(this.currentNode, 'children', children);
+          }
+        })
       }
     }
   }

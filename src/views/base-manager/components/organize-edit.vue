@@ -12,14 +12,14 @@
         <Input type="textarea" long :rows="2" v-model.trim="companyProfile" placeholder="请输入公司简介" />
       </div>
     </div>
-    <div class="modal-input-item">
+   <!-- <div  v-if="this.editType === 1" class="modal-input-item">
       <p class="label">所属机构</p>
       <div style="width: 350px">
         <Select v-model="organizeId" placeholder="选择所属机构" clearable>
           <Option v-for="item in organizeList" :value="item.organizeId" :key="item.organizeId">{{ item.organizeName }}</Option>
         </Select>
       </div>
-    </div>
+    </div>-->
     <div class="modal-input-item">
       <p class="label">所在地</p>
       <div>
@@ -27,7 +27,7 @@
           <Select style="width: 180px;margin-right: 10px" v-model="cProvinceId" :label-in-value="true" placeholder="选择省份" clearable @on-change="provinceChange">
             <Option v-for="item in selectProvinceList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
-          <Select style="width: 180px;margin-right: 10px" v-model="cCityId" :label-in-value="true" placeholder="选择城市" clearable @on-change="cityChange">
+          <Select v-if="this.editType !== 1" style="width: 180px;margin-right: 10px" v-model="cCityId" :label-in-value="true" placeholder="选择城市" clearable @on-change="cityChange">
             <Option v-for="item in selectCityList" :value="item.code" :key="item.code">{{ item.name }}</Option>
           </Select>
         </div>
@@ -50,10 +50,6 @@
       editType: {
         type: Number,
         default: 1
-      },
-      organizeList: {
-        type: Array,
-        default: []
       },
       isWrite: {
         type: Boolean,
@@ -137,24 +133,18 @@
           this.warningInfo('请输入公司简介')
           return false
         }
-        if (this.organizeId === '') {
-          this.warningInfo('请选择所属机构')
-          return false
-        }
         if (!this.currentProvince) {
           this.warningInfo('请选择城市')
           return false
         }
         return {
-          organizeId: this.organizeId,
           companyName: this.companyName,
           companyProfile: this.companyProfile,
           provinceCode: this.currentProvince.value,
           provinceName: this.currentProvince.label,
           cityCode: this.currentCity.value || '',
           cityName: this.currentCity.label || '',
-          remark: this.remark,
-          parentId: 0
+          remark: this.remark
         }
       }
     }
