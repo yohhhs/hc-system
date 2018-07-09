@@ -82,14 +82,13 @@
         this.postCode = this.detail.postCode
         this.remark = this.detail.remark
         this.addressDetail = this.detail.addressDetail
-        this.cAreaId = this.detail.provinceCode
+        this.cAreaId = this.detail.districtCode
         this.cCityId = this.detail.cityCode
-        this.cProvinceId = this.detail.districtCode
+        this.cProvinceId = this.detail.provinceCode
         this.currentProvince = {
           label: this.detail.provinceName,
           value: this.detail.provinceCode
         }
-        console.log(this.detail.provinceCode)
         this.selectCityList = cityDatas.find(item => {
           return item.code === this.detail.provinceCode
         }).children
@@ -107,29 +106,29 @@
     methods: {
       provinceChange (selection) {
         this.currentProvince = selection
+        this.cCityId = ''
+        this.cAreaId = ''
+        this.currentArea = null
+        this.currentCity = null
+        this.selectDistrictList = []
         if (selection) {
           this.selectCityList = cityDatas.find(item => {
             return item.code === selection.value
           }).children
         } else {
-          this.currentArea = null
-          this.currentCity = null
-          this.selectDistrictList = []
           this.selectCityList = []
-          this.cCityId = ''
-          this.cAreaId = ''
         }
       },
       cityChange (selection) {
         this.currentCity = selection
+        this.cAreaId = ''
+        this.currentArea = null
         if (selection) {
           this.selectDistrictList = this.selectCityList.find(item => {
             return item.code === selection.value
           }).children
         } else {
-          this.currentArea = null
           this.selectDistrictList = []
-          this.cAreaId = ''
         }
       },
       areaChange (selection) {

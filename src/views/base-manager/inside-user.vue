@@ -6,17 +6,39 @@
     <btn-wrapper @btnClick="btnClick"></btn-wrapper>
     <Table :columns="tableColumns" :loading="tableLoading" :data="tableData" @on-selection-change="tableSelectChange"></Table>
     <Page style="margin-top: 20px;text-align: center;" :current="pageNo" :total="total" show-elevator @on-change='changePage'></Page>
+    <Modal
+      v-model="addModal.isShow"
+      :mask-closable="false"
+      width="800"
+      title="添加">
+      <inside-edit v-if="addModal.isShow" ref="addEdit"></inside-edit>
+      <div slot="footer">
+        <Button type="primary" size="large" long :loading="addModal.loading"  @click="addConfirm">确定</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="writeModal.isShow"
+      :mask-closable="false"
+      width="800"
+      title="修改">
+      <inside-edit v-if="writeModal.isShow" ref="writeEdit" :isWrite="true" :detail="detail"></inside-edit>
+      <div slot="footer">
+        <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
   import queryWrapper from '@/components/query-wrapper'
   import btnWrapper from '@/components/btn-wrapper'
+  import insideEdit from './components/inside-edit'
   import { message, table, page, addModal, writeModal } from '@/common/js/mixins'
   import { insideUser } from '@/api/request'
 
   export default {
     data () {
       return {
+        detail: null,
         selectIds: [],
         insideMemberName: '',
         tableColumns: [
@@ -65,7 +87,8 @@
                   },
                   on: {
                     click: () => {
-
+                      this.detail = params.row
+                      this.openWriteModal()
                     }
                   }
                 }, '编辑')
@@ -77,7 +100,8 @@
     },
     components: {
       queryWrapper,
-      btnWrapper
+      btnWrapper,
+      insideEdit
     },
     mixins: [message, table, page, addModal, writeModal],
     created () {
@@ -85,11 +109,13 @@
     },
     methods: {
       getInsideUser () {
+        this.openTableLoading()
         insideUser.getInsideList({
           pageSize: 10,
           pageNo: this.pageNo,
           insideMemberName: this.insideMemberName
         }).then(data => {
+          this.closeTableLoading()
           if (data !== 'isError') {
             this.tableData = data.list
             this.total = data.total
@@ -107,6 +133,7 @@
       btnClick (handleName) {
         switch (handleName) {
           case '新增内勤人员':
+            this.openAddModal()
             break
           case '激活':
             if (this.selectIds.length === 0) {
@@ -144,6 +171,39 @@
             this.getInsideUser()
           }
         })
+      },
+      addConfirm () {
+        let returnData = this.$refs.addEdit.returnData()
+        if (returnData) {
+          this.openAddLoading()
+          insideUser.addInside({
+            ...returnData
+          }).then(data => {
+            this.closeAddLoading()
+            if (data !== 'isError') {
+              this.successInfo('添加成功')
+              this.getInsideUser()
+              this.closeAddModal()
+            }
+          })
+        }
+      },
+      writeConfirm () {
+        let returnData = this.$refs.writeEdit.returnData()
+        if (returnData) {
+          this.openWriteLoading()
+          insideUser.updateInside({
+            insideMemberId: this.detail.insideMemberId,
+            ...returnData
+          }).then(data => {
+            this.closeWriteLoading()
+            if (data !== 'isError') {
+              this.successInfo('修改成功')
+              this.getInsideUser()
+              this.closeWriteModal()
+            }
+          })
+        }
       }
     }
   }

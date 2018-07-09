@@ -46,7 +46,8 @@
           type: 'ghost',
           size: 'small',
         },
-        currentNode: null
+        currentNode: null,
+        currentParentNode: null
       }
     },
     components: {
@@ -83,7 +84,42 @@
         }
       },
       writeConfirm() {
-
+        if (this.editType === 3) {
+          let returnData = this.$refs.writeSale.returnData()
+          if (returnData) {
+            returnData.companyId = this.currentNode.data.companyId
+            organizeManager.updateSaleDepartment({
+              saleDepartmentId: this.currentNode.data.saleDepartmentId,
+              ...returnData
+            }).then(data => {
+              if (data !== 'isError') {
+                this.successInfo('修改成功')
+                this.getChildrenNode(this.currentParentNode)
+                this.closeWriteModal()
+              }
+            })
+          }
+        } else {
+          let returnData = this.$refs.writeEdit.returnData()
+          if (returnData) {
+            if (this.editType === 2) {
+              returnData.parentId = this.currentParentNode.data.companyId
+            } else {
+              returnData.parentId = 0
+            }
+            returnData.organizeId = this.currentNode.data.organizeId
+          }
+          organizeManager.updateCompany({
+            companyId: this.currentNode.data.companyId,
+            ...returnData
+          }).then(data => {
+            if (data !== 'isError') {
+              this.successInfo('更新成功')
+              this.getChildrenNode(this.currentParentNode)
+              this.closeWriteModal()
+            }
+          })
+        }
       },
       addConfirm() {
         if (this.editType === 3) {
@@ -95,7 +131,7 @@
             }).then(data => {
               if (data !== 'isError') {
                 this.successInfo('添加成功')
-                this.addNode()
+                this.getChildrenNode(this.currentNode)
                 this.closeAddModal()
               }
             })
@@ -114,23 +150,12 @@
             }).then(data => {
               if (data !== 'isError') {
                 this.successInfo('添加成功')
-                this.addNode()
+                this.getChildrenNode(this.currentNode)
                 this.closeAddModal()
-                /*if (this.editType === 2) {
-                  const children = this.currentNode.data.children || [];
-                  children.push({
-                    title: data.companyName,
-                    loading: false,
-                    data: data,
-                    children: []
-                  });
-                  this.$set(this.currentNode, 'children', children);
-                }*/
               }
             })
           }
         }
-
       },
       renderContent(h, {root, node, data}) {
         return h('span', {
@@ -191,7 +216,16 @@
               },
               on: {
                 click: () => {
-                  console.log(data.data.parentId)
+                  if (data.data.parentId === 0) {
+                    this.editType = 1
+                  } else {
+                    this.editType = 2
+                  }
+                  this.currentNode = data
+                  const parentKey = root.find(el => el === node).parent;
+                  const parent = root.find(el => el.nodeKey === parentKey).node;
+                  this.currentParentNode = parent
+                  this.openWriteModal()
                 }
               }
             }, '编辑'),
@@ -247,6 +281,9 @@
                 click: () => {
                   this.editType = 3
                   this.currentNode = data
+                  const parentKey = root.find(el => el === node).parent;
+                  const parent = root.find(el => el.nodeKey === parentKey).node;
+                  this.currentParentNode = parent
                   this.openWriteModal()
                 }
               }
@@ -419,13 +456,13 @@
         })
         this.organizeData = init
       },
-      addNode () {
+      getChildrenNode (parentNode) {
         let organizeId = ''
         let parentId = ''
         let isTop = false
-        organizeId = this.currentNode.data.organizeId
-        if (this.currentNode.data.companyId) {
-          parentId = this.currentNode.data.companyId
+        organizeId = parentNode.data.organizeId
+        if (parentNode.data.companyId) {
+          parentId = parentNode.data.companyId
         } else {
           isTop = true
           parentId = 0
@@ -449,7 +486,7 @@
           }
           if (!isTop) {
             organizeManager.getSaleDepartmentList({
-              companyId: this.currentNode.data.companyId
+              companyId: parentNode.data.companyId
             }).then(data => {
               if (data !== 'isError') {
                 data.forEach(item => {
@@ -461,11 +498,11 @@
                     }
                   )
                 })
-                this.$set(this.currentNode, 'children', children);
+                this.$set(parentNode, 'children', children);
               }
             })
           } else {
-            this.$set(this.currentNode, 'children', children);
+            this.$set(parentNode, 'children', children);
           }
         })
       }
