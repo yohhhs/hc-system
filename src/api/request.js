@@ -292,5 +292,6 @@ export const insideUser = {
   addInside,
   getInsideList,
   updateInside,
-  updateInsideStatus
+  updateInsideStatus,
+  getOrganizeUserList
 }

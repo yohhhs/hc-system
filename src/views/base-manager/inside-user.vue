@@ -11,7 +11,7 @@
       :mask-closable="false"
       width="800"
       title="添加">
-      <inside-edit v-if="addModal.isShow" ref="addEdit"></inside-edit>
+      <inside-edit v-if="addModal.isShow" ref="addEdit" :orgList="orgList"></inside-edit>
       <div slot="footer">
         <Button type="primary" size="large" long :loading="addModal.loading"  @click="addConfirm">确定</Button>
       </div>
@@ -38,6 +38,7 @@
   export default {
     data () {
       return {
+        orgList: [],
         detail: null,
         selectIds: [],
         insideMemberName: '',
@@ -106,8 +107,19 @@
     mixins: [message, table, page, addModal, writeModal],
     created () {
       this.getInsideUser()
+      this.getOrgList()
     },
     methods: {
+      getOrgList () {
+        insideUser.getOrganizeUserList({
+          pageSize: 1000,
+          pageNo: 1
+        }).then(data => {
+          if (data !== 'isError') {
+            this.orgList = data.list
+          }
+        })
+      },
       getInsideUser () {
         this.openTableLoading()
         insideUser.getInsideList({
