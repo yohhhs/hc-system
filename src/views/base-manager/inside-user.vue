@@ -204,6 +204,7 @@
         let returnData = this.$refs.writeEdit.returnData()
         if (returnData) {
           this.openWriteLoading()
+          console.log(returnData)
           insideUser.updateInside({
             insideMemberId: this.detail.insideMemberId,
             ...returnData

@@ -221,6 +221,7 @@ export const updateSaleDepartment = params => {
 }
 // 添加内勤人员
 export const addInside = params => {
+  params.password = md5(params.password)
   return instance.post('/insideMember/addInsideMemberList', params)
 }
 // 内勤人员列表
@@ -229,6 +230,9 @@ export const getInsideList = params => {
 }
 // 更新内勤人员
 export const updateInside = params => {
+  if (params.password !== '') {
+    params.password = md5(params.password)
+  }
   return instance.post('/insideMember/updateInsideMemberList', params)
 }
 // 更新内勤人员状态

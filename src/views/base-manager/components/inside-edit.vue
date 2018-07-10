@@ -26,7 +26,7 @@
     </div>
     <div class="modal-input-item">
       <p class="label">所属公司</p>
-      <div>
+      <div v-if="!isWrite">
         <Select style="width: 180px;margin: 0 15px 15px 0" v-model="currentOrganizeId" placeholder="请选择机构" @on-change="orgChange">
           <Option v-for="item in orgList" :value="item.organizeId" :key="item.organizeId">{{ item.organizeName }}</Option>
         </Select>
@@ -35,6 +35,9 @@
             <Option v-for="item in company.data" :value="item.companyId" :key="item.companyId">{{ item.companyName }}</Option>
           </Select>
         </template>
+      </div>
+      <div v-else>
+        {{companyName}}
       </div>
     </div>
     <div class="modal-input-item">
@@ -46,7 +49,7 @@
     <div class="modal-input-item">
       <p class="label">用户状态</p>
       <div style="width: 350px">
-        <Select style="width: 180px;margin-right: 10px" v-model="status" placeholder="选择内勤状态" @on-change="orgChange(1)">
+        <Select style="width: 180px;margin-right: 10px" v-model="status" placeholder="选择内勤状态">
           <Option v-for="item in statusList" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </div>
@@ -76,13 +79,14 @@
     },
     data () {
       return {
+        companyName: '',
         currentOrganizeId: '',
+        currentCompanyId: '',
         companyLists: [],
         account: '',
         password: '',
         insideMemberName: '',
         mobile: '',
-        companyId: '',
         saleDepartmentIds: '',
         status: 1,
         statusList: [
@@ -119,16 +123,18 @@
     created () {
       if (this.isWrite) {
         this.account = this.detail.account
-        this.password = this.detail.password
         this.insideMemberName = this.detail.insideMemberName
         this.mobile = this.detail.mobile
-        this.companyId = this.detail.companyId
+        this.currentCompanyId = this.detail.companyId
+        this.companyName = this.detail.companyName
         this.saleDepartmentIds = this.detail.saleDepartmentIds
         this.status = this.detail.status
+        this.getSaleList(this.detail.companyId)
       }
     },
     methods: {
       orgChange (id) {
+        this.currentCompanyId = ''
         companyList({
           organizeId: this.currentOrganizeId,
           parentId: 0
@@ -147,8 +153,9 @@
         })
       },
       companyChange (index) {
+        this.saleDepartmentIds = ''
         let maxLen = this.companyLists.length - 1
-        let parentId = this.companyLists[index].companyId
+        let parentId = this.currentCompanyId = this.companyLists[index].companyId
         if (maxLen !== index) {
           this.companyLists.splice(index + 1, maxLen - index)
         }
@@ -168,29 +175,66 @@
             }
           }
         })
+        this.getSaleList(parentId)
+      },
+      getSaleList (id) {
         this.openTableLoading()
         getSaleDepartmentList({
-          companyId: parentId
+          companyId: id
         }).then(data => {
           this.closeTableLoading()
           if (data !== 'isError') {
+            if (this.isWrite) {
+              data.forEach(item => {
+                if (this.saleDepartmentIds.indexOf(item.saleDepartmentId) > -1) {
+                  item._checked = true
+                }
+              })
+            }
             this.tableData = data
           }
         })
       },
-      tableSelectChange (selection) {},
+      tableSelectChange (selection) {
+        let ids = []
+        selection.forEach(item => {
+          ids.push(item.saleDepartmentId)
+        })
+        this.saleDepartmentIds = ids.toString()
+      },
       returnData() {
         if (this.account === '') {
           this.warningInfo('请输入账号')
           return false
         }
-        if (this.password === '') {
+        if (!this.isWrite && this.password === '') {
           this.warningInfo('请输入密码')
           return false
         }
         if (this.insideMemberName === '') {
           this.warningInfo('请输入内勤人员姓名')
           return false
+        }
+        if (this.mobile === '') {
+          this.warningInfo('请输入手机号')
+          return false
+        }
+        if (!this.isWrite && this.currentCompanyId === '') {
+          this.warningInfo('请选择公司')
+          return false
+        }
+        if (this.saleDepartmentIds === '') {
+          this.warningInfo('请选择营业部')
+          return false
+        }
+        return {
+          account: this.account,
+          password: this.password,
+          insideMemberName: this.insideMemberName,
+          mobile: this.mobile,
+          companyId: this.currentCompanyId,
+          saleDepartmentIds: this.saleDepartmentIds,
+          status: this.status
         }
       }
     }
