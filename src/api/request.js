@@ -245,7 +245,8 @@ export const baseGoods = {
   getGoodsDetail,
   getGoodsList,
   updateGoods,
-  updateGoodsStatus
+  updateGoodsStatus,
+  getSupplierList
 }
 export const organizeUser = {
   addOrganizeUser,

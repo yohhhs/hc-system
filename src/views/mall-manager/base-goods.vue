@@ -21,7 +21,7 @@
         </Select>
       </query-wrapper>
       <Upload
-        with-credentials
+        :withCredentials="true"
         action="https://www.topasst.com/cms/file/uploadFile">
         <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
       </Upload>
@@ -48,6 +48,7 @@
         },
         selectIds: [],
         brandList: [],
+        supplierList: [],
         staticData: {
           goodsType: [
             {
@@ -156,6 +157,16 @@
           }
         })
       },
+      getSupplierList () {
+        baseGoods.getSupplierList({
+          pageSize: 100000,
+          pageNo: 1
+        }).then(data => {
+          if (data !== 'isError') {
+            this.supplierList = data.list
+          }
+        })
+      },
       getBrandList () {
         baseGoods.getBrandList().then(data => {
           if (data !== 'isError') {
@@ -165,9 +176,13 @@
       },
       changePage (no) {
         this.pageNo = no
+        this.getGoodsList()
       },
       btnClick () {},
-      queryClick () {},
+      queryClick () {
+        this.pageNo = 1
+        this.getGoodsList()
+      },
       queryStartTimeChange (time) {
         this.queryArgs.addStartTime =time
       },
