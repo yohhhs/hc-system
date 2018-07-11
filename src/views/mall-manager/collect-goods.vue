@@ -28,8 +28,9 @@
       <Modal
         v-model="addModal.isShow"
         :mask-closable="false"
+        :width="800"
         title="添加集采商品">
-        <collect-edit></collect-edit>
+        <collect-edit v-if="addModal.isShow" ref="addEdit" :goodsList="goodsList" :activeList="activeList" :orgList="orgList"></collect-edit>
         <div slot="footer">
           <Button type="primary" size="large" long :loading="addModal.loading"  @click="addConfirm">确定</Button>
         </div>
@@ -37,7 +38,9 @@
       <Modal
         v-model="writeModal.isShow"
         :mask-closable="false"
+        :width="800"
         title="修改集采商品">
+        <collect-edit v-if="writeModal.isShow" ref="writeEdit" :goodsList="goodsList" :activeList="activeList" :orgList="orgList" :isWrite="true" :detail="detail"></collect-edit>
         <div slot="footer">
           <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
         </div>
@@ -53,6 +56,10 @@
   export default {
     data () {
       return {
+        detail: null,
+        orgList: [],
+        activeList: [],
+        goodsList: [],
         selectIds: [],
         statusList: [
           {
@@ -122,7 +129,7 @@
                   },
                   on: {
                     click: () => {
-
+                      this.currentPurchaseGoodsId = params.row.purchaseGoodsId
                     }
                   }
                 }, '查看'),
@@ -136,14 +143,15 @@
                   },
                   on: {
                     click: () => {
-
+                      this.currentPurchaseGoodsId = params.row.purchaseGoodsId
                     }
                   }
                 }, '编辑')
               ])
             }
           }
-        ]
+        ],
+        currentPurchaseGoodsId: ''
       }
     },
     components: {
@@ -153,9 +161,42 @@
     },
     mixins: [message, table, page, writeModal, addModal],
     created () {
+      this.getGoodsList()
+      this.getActiveList()
       this.getPurchaseGoodsList()
+      this.getOrgList()
     },
     methods: {
+      getOrgList () {
+        collectGoods.getOrganizeUserList({
+          pageSize: 1000,
+          pageNo: 1
+        }).then(data => {
+          if (data !== 'isError') {
+            this.orgList = data.list
+          }
+        })
+      },
+      getActiveList () {
+        collectGoods.getActiveList({
+          pageNo: 1,
+          pageSize: 10000
+        }).then(data => {
+          if (data !== 'isError') {
+            this.activeList = data.list
+          }
+        })
+      },
+      getGoodsList () {
+        collectGoods.getGoodsList({
+          pageSize: 10000,
+          pageNo: 1
+        }).then(data => {
+          if (data !== 'isError') {
+            this.goodsList = data.list
+          }
+        })
+      },
       getPurchaseGoodsList () {
         this.openTableLoading()
         collectGoods.getPurchaseGoodsList({
@@ -218,8 +259,39 @@
           }
         })
       },
-      addConfirm () {},
-      writeConfirm () {},
+      addConfirm () {
+        let returnData = this.$refs.addEdit.returnData()
+        if (returnData) {
+          this.openAddLoading()
+          collectGoods.addPurchaseGoods({
+            ...returnData
+          }).then(data => {
+            this.closeAddLoading()
+            if (data !== 'isError') {
+              this.successInfo('添加成功')
+              this.getPurchaseGoodsList()
+              this.closeAddModal()
+            }
+          })
+        }
+      },
+      writeConfirm () {
+        let returnData = this.$refs.addEdit.returnData()
+        if (returnData) {
+          this.openWriteLoading()
+          collectGoods.updatePurchaseGoods({
+            purchaseGoodsId: this.currentPurchaseGoodsId,
+            ...returnData
+          }).then(data => {
+            this.closeWriteLoading()
+            if (data !== 'isError') {
+              this.successInfo('添加成功')
+              this.getPurchaseGoodsList()
+              this.closeWriteModal()
+            }
+          })
+        }
+      },
       tableSelectChange (selection) {
         let ids = []
         selection.forEach(item => {

@@ -268,7 +268,10 @@ export const collectGoods = {
   getPurchaseGoodsDetail,
   getPurchaseGoodsList,
   updatePurchaseGoods,
-  updatePurchaseGoodsStatus
+  updatePurchaseGoodsStatus,
+  getGoodsList,
+  getActiveList,
+  getOrganizeUserList
 }
 export const activeList = {
   addActive,
