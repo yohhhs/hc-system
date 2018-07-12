@@ -1,9 +1,15 @@
 <template>
   <div class="collect-edit">
+    <div v-if="isLook" class="modal-input-item">
+      <p class="label">集采商品id</p>
+      <div>
+        {{detail.purchaseOrderNumber}}
+      </div>
+    </div>
     <div class="modal-input-item">
       <p class="label">基础商品</p>
       <div style="width: 350px">
-        <Select v-model="goodsId" placeholder="选择商品">
+        <Select v-model="goodsId" placeholder="选择商品" :disabled="isLook">
           <Option v-for="item in goodsList" :value="item.goodsId" :key="item.goodsId">{{ item.goodsName }}</Option>
         </Select>
       </div>
@@ -11,13 +17,13 @@
     <div class="modal-input-item">
       <p class="label">市场价格（元）</p>
       <div style="width: 350px">
-        <InputNumber style="width: 100%" v-model="marketPrice" :min="0"></InputNumber>
+        <InputNumber style="width: 100%" v-model="marketPrice" :min="0" :disabled="isLook"></InputNumber>
       </div>
     </div>
     <div class="modal-input-item">
       <p class="label">商品售价（元）</p>
       <div style="width: 350px">
-        <InputNumber style="width: 100%" v-model="salePrice" :min="0"></InputNumber>
+        <InputNumber style="width: 100%" v-model="salePrice" :min="0" :disabled="isLook"></InputNumber>
       </div>
     </div>
     <div class="modal-input-item">
@@ -26,24 +32,24 @@
         <DatePicker
           :value="purchaseEndTime"
           style="width: 350px"
-          type="datetime" placeholder="集采结到期时间" @on-change="endChange"></DatePicker>
+          type="datetime" placeholder="集采结到期时间" @on-change="endChange" :disabled="isLook"></DatePicker>
       </div>
     </div>
     <div class="modal-input-item">
       <p class="label">集采数量</p>
       <div style="width: 350px">
-        <InputNumber style="width: 100%" :step="10" :precision="0" v-model="purchaseMinCount" :min="0"></InputNumber>
+        <InputNumber style="width: 100%" :step="10" :precision="0" v-model="purchaseMinCount" :min="0" :disabled="isLook"></InputNumber>
       </div>
     </div>
     <div class="modal-input-item">
       <p class="label">关联活动</p>
       <div style="width: 350px">
-        <Select v-model="activityId" placeholder="选择关联活动">
+        <Select v-model="activityId" placeholder="选择关联活动" :disabled="isLook">
           <Option v-for="item in activeList" :value="item.activityId" :key="item.activityId">{{ item.activityName }}</Option>
         </Select>
       </div>
     </div>
-    <div class="modal-input-item">
+    <div v-if="!isLook" class="modal-input-item">
       <p class="label">关联营业部</p>
       <div>
         <Select style="width: 180px;margin: 0 15px 15px 0" v-model="currentOrganizeId" placeholder="请选择机构" @on-change="orgChange">
@@ -63,6 +69,18 @@
         <Table style="width: 620px" :columns="saleTableColumns" :loading="saleTableLoading" :data="saleTableData"></Table>
       </div>
     </div>
+    <div v-if="isLook" class="modal-input-item">
+      <p class="label">商品上架时间</p>
+      <div>
+        {{detail.createTimeStr}}
+      </div>
+    </div>
+    <div v-if="isLook" class="modal-input-item">
+      <p class="label">商品状态</p>
+      <div>
+        {{detail.state === 0 ? '下架' : '上架'}}
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -71,6 +89,10 @@
 
   export default {
     props: {
+      isLook: {
+        type: Boolean,
+        default: false
+      },
       orgList: {
         type: Array,
         default: () => []
@@ -115,7 +137,8 @@
                   h('Button', {
                     props: {
                       type: 'error',
-                      size: 'small'
+                      size: 'small',
+                      disabled: this.isLook
                     },
                     on: {
                       click: () => {
@@ -177,6 +200,16 @@
     components: {},
     mixins: [message, table],
     created () {
+      if (this.isWrite) {
+        console.log(this.detail)
+        this.goodsId = this.detail.goodsId
+        this.marketPrice = this.detail.marketPrice
+        this.salePrice = this.detail.salePrice
+        this.purchaseEndTime = this.detail.purchaseEndTime
+        this.purchaseMinCount = this.detail.purchaseMinCount
+        this.activityId = this.detail.activityId
+        this.saleTableData = this.detail.dptList
+      }
     },
     methods: {
       orgChange (id) {

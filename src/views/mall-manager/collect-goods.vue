@@ -45,6 +45,16 @@
           <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
         </div>
       </Modal>
+    <Modal
+      v-model="lookModal"
+      :mask-closable="false"
+      :width="800"
+      title="查看集采商品">
+      <collect-edit v-if="lookModal" :goodsList="goodsList" :activeList="activeList" :orgList="orgList" :isWrite="true" :detail="detail" :isLook="true"></collect-edit>
+      <div slot="footer">
+        <!--<Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>-->
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -56,6 +66,7 @@
   export default {
     data () {
       return {
+        lookModal: false,
         detail: null,
         orgList: [],
         activeList: [],
@@ -129,7 +140,16 @@
                   },
                   on: {
                     click: () => {
+                      console.log(1)
                       this.currentPurchaseGoodsId = params.row.purchaseGoodsId
+                      collectGoods.getPurchaseGoodsDetail({
+                        purchaseGoodsId: params.row.purchaseGoodsId
+                      }).then(data => {
+                        if (data !== 'isError') {
+                          this.detail = data
+                          this.lookModal = true
+                        }
+                      })
                     }
                   }
                 }, '查看'),
@@ -144,6 +164,14 @@
                   on: {
                     click: () => {
                       this.currentPurchaseGoodsId = params.row.purchaseGoodsId
+                      collectGoods.getPurchaseGoodsDetail({
+                        purchaseGoodsId: params.row.purchaseGoodsId
+                      }).then(data => {
+                        if (data !== 'isError') {
+                          this.detail = data
+                          this.openWriteModal()
+                        }
+                      })
                     }
                   }
                 }, '编辑')
@@ -276,7 +304,7 @@
         }
       },
       writeConfirm () {
-        let returnData = this.$refs.addEdit.returnData()
+        let returnData = this.$refs.writeEdit.returnData()
         if (returnData) {
           this.openWriteLoading()
           collectGoods.updatePurchaseGoods({
@@ -285,7 +313,7 @@
           }).then(data => {
             this.closeWriteLoading()
             if (data !== 'isError') {
-              this.successInfo('添加成功')
+              this.successInfo('修改成功')
               this.getPurchaseGoodsList()
               this.closeWriteModal()
             }
