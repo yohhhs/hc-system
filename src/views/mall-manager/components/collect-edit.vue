@@ -123,11 +123,12 @@
               width: 200
             },
             {
-              title: '营业部地址',
-              render: (h, params) => {
-                let row = params.row
-                return h('div', `${row.provinceName} ${row.cityName} ${row.districtCode} ${row.addressDetail}`)
-              }
+              title: '所属机构',
+              key: 'organizeName'
+            },
+            {
+              title: '所属分公司',
+              key: 'companyName'
             },
             {
               title: '操作',
@@ -169,11 +170,12 @@
               width: 200
             },
             {
-              title: '营业部地址',
-              render: (h, params) => {
-                let row = params.row
-                return h('div', `${row.provinceName} ${row.cityName} ${row.districtCode} ${row.addressDetail}`)
-              }
+              title: '所属机构',
+              key: 'organizeName'
+            },
+            {
+              title: '所属分公司',
+              key: 'companyName'
             },
             {
               title: '操作',

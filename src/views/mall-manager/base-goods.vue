@@ -20,25 +20,52 @@
           <Option v-for="item in brandList" :value="item.infoId" :key="item.infoId">{{ item.infoValue }}</Option>
         </Select>
       </query-wrapper>
-      <Upload
-        :withCredentials="true"
-        action="https://www.topasst.com/cms/file/uploadFile">
-        <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
-      </Upload>
       <btn-wrapper @btnClick="btnClick"></btn-wrapper>
       <Table :columns="tableColumns" :loading="tableLoading" :data="tableData" @on-selection-change="tableSelectChange"></Table>
       <Page style="margin-top: 20px;text-align: center;" :current="pageNo" :total="total" show-elevator @on-change='changePage'></Page>
+      <Modal
+        v-model="addModal.isShow"
+        :mask-closable="false"
+        :width="800"
+        title="添加基础商品">
+        <base-goods-edit v-if="addModal.isShow" ref="addEdit" :brandList="brandList" :supplierList="supplierList"></base-goods-edit>
+        <div slot="footer">
+          <Button type="primary" size="large" long :loading="addModal.loading"  @click="addConfirm">确定</Button>
+        </div>
+      </Modal>
+      <Modal
+        v-model="writeModal.isShow"
+        :mask-closable="false"
+        :width="800"
+        title="修改基础商品">
+        <base-goods-edit v-if="writeModal.isShow" ref="writeEdit" :isWrite="true" :detail="detail" :brandList="brandList" :supplierList="supplierList"></base-goods-edit>
+        <div slot="footer">
+          <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
+        </div>
+      </Modal>
+      <Modal
+        v-model="lookModal"
+        :mask-closable="false"
+        :width="800"
+        title="查看基础商品">
+        <base-goods-edit v-if="lookModal" :isLook="true" :isWrite="true" :detail="detail" :brandList="brandList" :supplierList="supplierList"></base-goods-edit>
+        <div slot="footer">
+        </div>
+      </Modal>
     </div>
 </template>
 <script>
   import queryWrapper from '@/components/query-wrapper'
   import btnWrapper from '@/components/btn-wrapper'
+  import baseGoodsEdit from './components/base-goods-edit'
   import { table, message, addModal, writeModal, page } from '@/common/js/mixins'
   import { baseGoods } from '@/api/request'
 
   export default {
     data () {
       return {
+        lookModal: false,
+        detail: null,
         queryArgs: {
           keyword: '',
           addStartTime: '',
@@ -111,7 +138,14 @@
                   },
                   on: {
                     click: () => {
-
+                      baseGoods.getGoodsDetail({
+                        goodsId: params.row.goodsId
+                      }).then(data => {
+                        if (data !== 'isError') {
+                          this.detail = data
+                          this.lookModal = true
+                        }
+                      })
                     }
                   }
                 }, '查看'),
@@ -125,7 +159,14 @@
                   },
                   on: {
                     click: () => {
-
+                      baseGoods.getGoodsDetail({
+                        goodsId: params.row.goodsId
+                      }).then(data => {
+                        if (data !== 'isError') {
+                          this.detail = data
+                          this.openWriteModal()
+                        }
+                      })
                     }
                   }
                 }, '编辑')
@@ -137,12 +178,14 @@
     },
     components: {
       queryWrapper,
-      btnWrapper
+      btnWrapper,
+      baseGoodsEdit
     },
     mixins: [table, message, addModal, writeModal, page],
     created () {
       this.getBrandList()
       this.getGoodsList()
+      this.getSupplierList()
     },
     methods: {
       getGoodsList () {
@@ -178,7 +221,6 @@
         this.pageNo = no
         this.getGoodsList()
       },
-      btnClick () {},
       queryClick () {
         this.pageNo = 1
         this.getGoodsList()
@@ -222,6 +264,39 @@
           ids.push(item.goodsId)
         })
         this.selectIds = ids
+      },
+      addConfirm () {
+        let returnData = this.$refs.addEdit.returnData()
+        if (returnData) {
+          this.openAddLoading()
+          baseGoods.addGoods({
+            ...returnData
+          }).then(data => {
+            this.closeAddLoading()
+            if (data !== 'isError') {
+              this.successInfo('添加成功')
+              this.getGoodsList()
+              this.closeAddModal()
+            }
+          })
+        }
+      },
+      writeConfirm () {
+        let returnData = this.$refs.writeEdit.returnData()
+        if (returnData) {
+          this.openWriteLoading()
+          baseGoods.updateGoods({
+            goodsId: this.detail.goodsId,
+            ...returnData
+          }).then(data => {
+            this.closeWriteLoading()
+            if (data !== 'isError') {
+              this.successInfo('修改成功')
+              this.getGoodsList()
+              this.closeWriteModal()
+            }
+          })
+        }
       }
     }
   }
