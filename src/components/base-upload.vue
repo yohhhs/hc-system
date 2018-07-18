@@ -12,15 +12,13 @@
           ref="baseUpload"
           style="margin-top: 20px"
           v-show="!uploading"
-          :before-upload="handleBeforeUpload"
-          :headers="addHeaders"
           :show-upload-list="false"
           :on-success="uploadSuccess"
           :on-error="uploadError"
           accept="image/*"
           :format="['jpg','jpeg','png']"
           :on-format-error="FormatError"
-          action="http://182.140.132.183/sms/upload"
+          action="https://www.topasst.com/cms/file/uploadFile"
         >
           <Button type="ghost" icon="ios-cloud-upload-outline">{{btnTip}}</Button>
         </Upload>
@@ -31,7 +29,6 @@
 </template>
 
 <script>
-  import { returnHeaders } from '../common/js/util'
   import {  message } from '../common/js/mixins.js'
 
   export default {
@@ -50,8 +47,7 @@
         coverUrl: '',
         file: null,
         uploading: false,
-        addHeaders: null,
-        fileId: ''
+        addHeaders: null
       }
     },
     mixins: [message],
@@ -59,23 +55,11 @@
       handleBeforeUpload(file) {
         this.file = file
         this.uploading = true
-        this.getHeaders()
-        return false
-      },
-      async getHeaders() {
-        let headers = await returnHeaders(this.file)
-        this.addHeaders = headers
-        if (this.addHeaders) {
-          this.$nextTick(() => {
-            this.$refs.baseUpload.post(this.file)
-          })
-        }
       },
       uploadSuccess(data) {
-        this.fileId = data[0].id
-        this.coverUrl = window.URL.createObjectURL(this.file)
+        this.coverUrl = 'https://www.topasst.com/images/' + data.data
         this.uploading = false
-        this.$emit('uploadSuccess', data[0].id)
+        this.$emit('uploadSuccess', data)
       },
       uploadError() {
         this.uploading = false
@@ -87,9 +71,6 @@
       MaxSize() {
         this.uploading = false
         this.warningInfo('图片大小超出限制')
-      },
-      reFileId() {
-        return this.fileId
       },
       clearCover() {
         this.coverUrl = ''
