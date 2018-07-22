@@ -59,7 +59,7 @@
 
 <script>
   import {message, table} from '@/common/js/mixins'
-  import { companyList, getSaleDepartmentList } from '@/api/request'
+  import { companyList, getSaleDepartmentList, getInsideSaleList } from '@/api/request'
 
   export default {
     name: "inside-edit",
@@ -179,7 +179,8 @@
       },
       getSaleList (id) {
         this.openTableLoading()
-        getSaleDepartmentList({
+        getInsideSaleList({
+          insideMemberId: this.detail.insideMemberId || '',
           companyId: id
         }).then(data => {
           this.closeTableLoading()
