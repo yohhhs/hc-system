@@ -86,12 +86,8 @@
             align: 'center'
           },
           {
-            title: '订单id',
-            key: 'purchaseGoodsId'
-          },
-          {
-            title: '总订单id',
-            key: 'purchaseOrderId'
+            title: '订单编号',
+            key: 'purchaseOrderNumber'
           },
           {
             title: '用户',
