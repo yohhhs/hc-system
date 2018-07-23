@@ -228,6 +228,10 @@ export const addInside = params => {
 export const getInsideList = params => {
   return instance.post('/insideMember/getInsideMemberList', params)
 }
+// 获取内勤所需营业部
+export const getInsideSaleList = params => {
+  return instance.post('/insideMember/getSaleDepartmentList', params)
+}
 // 更新内勤人员
 export const updateInside = params => {
   if (params.password !== '') {
