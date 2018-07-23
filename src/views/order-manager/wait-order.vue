@@ -49,6 +49,11 @@
         },
         tableColumns: [
           {
+            type: 'selection',
+            width: 60,
+            align: 'center'
+          },
+          {
             title: '订单id',
             key: 'purchaseGoodsId'
           },
@@ -128,7 +133,7 @@
                         loading: true,
                         onOk: () => {
                           allOrder.sendOrder({
-                            purchaseOrderId: params.row.purchaseOrderId
+                            purchaseOrderIds: params.row.purchaseOrderId
                           }).then(data => {
                             this.$Modal.remove()
                             if (data !== 'isError') {
@@ -136,10 +141,8 @@
                               this.getAllOrder()
                             }
                           })
-
                         }
                       })
-
                     }
                   }
                 }, '确认发货')
@@ -192,7 +195,7 @@
               loading: true,
               onOk: () => {
                 allOrder.sendOrder({
-                  purchaseOrderId: this.selectIds.toString()
+                  purchaseOrderIds: this.selectIds.toString()
                 }).then(data => {
                   if (data !== 'isError') {
                     this.successInfo('发货成功')
