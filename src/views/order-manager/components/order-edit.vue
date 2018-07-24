@@ -109,36 +109,41 @@
           {{detail.receiveAddress}}
         </div>
       </div>
-      <div class="modal-input-item">
-        <p class="label">发货时间</p>
-        <div style="width: 350px">
+      <template  v-if="detail.orderState === 3 || detail.orderState === 4">
+        <div class="modal-input-item">
+          <p class="label">发货时间</p>
+          <div style="width: 350px">
+            {{detail.sendTime}}
+          </div>
         </div>
-      </div>
-      <div class="modal-input-item">
-        <p class="label">物流公司</p>
-        <div style="width: 350px">
+        <div class="modal-input-item">
+          <p class="label">物流公司</p>
+          <div style="width: 350px">
+          </div>
         </div>
-      </div>
-      <div class="modal-input-item">
-        <p class="label">物流单号</p>
-        <div style="width: 350px">
+        <div class="modal-input-item">
+          <p class="label">物流单号</p>
+          <div style="width: 350px">
+          </div>
         </div>
-      </div>
-      <div class="modal-input-item">
+      </template>
+      <div v-if="detail.orderState === 4" class="modal-input-item" >
         <p class="label">确认收货时间</p>
         <div style="width: 350px">
+          {{detail.receiveTime}}
         </div>
       </div>
     </template>
-    <template v-else>
-      <div class="modal-input-item">
-        <p class="label">取消类别</p>
-        <div style="width: 350px">
-        </div>
-      </div>
+    <template  v-if="detail.orderState === 9">
+      <!--<div class="modal-input-item">-->
+        <!--<p class="label">取消类别</p>-->
+        <!--<div style="width: 350px">-->
+        <!--</div>-->
+      <!--</div>-->
       <div class="modal-input-item">
         <p class="label">取消时间</p>
         <div style="width: 350px">
+          {{detail.cancelTime}}
         </div>
       </div>
     </template>

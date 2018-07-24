@@ -218,7 +218,8 @@
       getGoodsList () {
         collectGoods.getGoodsList({
           pageSize: 10000,
-          pageNo: 1
+          pageNo: 1,
+          goodsState: 1
         }).then(data => {
           if (data !== 'isError') {
             this.goodsList = data.list

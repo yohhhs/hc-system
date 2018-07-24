@@ -243,6 +243,43 @@ export const updateInside = params => {
 export const updateInsideStatus = params => {
   return instance.post('/insideMember/updateStatus', params)
 }
+// 财务管理订单列表
+export const getFinanceList = params => {
+  return instance.post('/finance/getFinanceList', params)
+}
+// 财务管理金额统计
+export const getFinanceCount = params => {
+  return instance.post('/finance/getMoneyCount', params)
+}
+// 获取礼品派送列表
+export const getGiftRecordList = params => {
+  return instance.post('/business/getGiftRecordList', params)
+}
+// 获取派送明细列表
+export const getMemberList = params => {
+  return instance.post('/business/getMemberList', params)
+}
+// 获取转接人列表
+export const getTransferMember = params => {
+  return instance.post('/business/getTransferMemberList', params)
+}
+// 集采订单统计
+export const getPurchaseGoodsCountList = params => {
+  return instance.post('/business/getPurchaseGoodsList', params)
+}
+// 集采订单明细
+export const getGoodsCountDetail = params => {
+  return instance.post('/business/getPurchaseGoodsOrderList', params)
+}
+export const collectCount = {
+  getPurchaseGoodsCountList,
+  getGoodsCountDetail
+}
+export const giftCount = {
+  getGiftRecordList,
+  getMemberList,
+  getTransferMember
+}
 export const baseGoods = {
   addGoods,
   getBrandList,

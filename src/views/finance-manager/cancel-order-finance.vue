@@ -2,12 +2,16 @@
   <div class="already-paid-report">
     <div class="count-money">
       <div class="count-item">
-        <p class="count-name">当月取消订单金额</p>
-        <p class="count-price"><span style="font-weight: bold;">234234</span> 元</p>
+        <p class="count-name">总计取消订单金额</p>
+        <p class="count-price"><span style="font-weight: bold;">{{countPrice}}</span> 元</p>
       </div>
       <div class="count-item">
-        <p class="count-name">总计取消订单金额</p>
-        <p class="count-price"><span style="font-weight: bold;">234234</span> 元</p>
+        <p class="count-name flex-wrapper">
+          <Icon style="cursor: pointer" type="arrow-left-b" @click="subtractDate"></Icon>
+          {{showDateStr}}
+          <Icon style="cursor: pointer" type="arrow-right-b" @click="addDate"></Icon>
+        </p>
+        <p class="count-price"><span style="font-weight: bold;">{{monthPrice}}</span> 元</p>
       </div>
     </div>
     <query-wrapper @userQuery="queryList">
@@ -32,15 +36,16 @@
 <script>
   import queryWrapper from '@/components/query-wrapper'
   import btnWrapper from '@/components/btn-wrapper'
-  import {table, page} from '@/common/js/mixins'
+  import {table, page, countPrice} from '@/common/js/mixins'
+  import {getFinanceList, getFinanceCount} from '@/api/request'
 
   export default {
     data() {
       return {
         queryArgs: {
           keyword: '',
-          startTime: '',
-          endTime: '',
+          cancelStartTime: '',
+          cancelEndTime: '',
           payType: ''
         },
         payTypeList: [
@@ -49,34 +54,36 @@
             name: '线上'
           },
           {
-            id: 0,
+            id: 2,
             name: '线下'
           }
         ],
         tableColumns: [
           {
-            title: '订单id',
-            key: ''
+            title: '订单编号',
+            key: 'purchaseOrderNumber'
           },
           {
             title: '订单商品',
-            key: ''
+            key: 'goodsName '
           },
           {
             title: '采购数量',
-            key: ''
+            key: 'goodsCount'
           },
           {
             title: '订单金额',
-            key: ''
+            render: (h, params) => {
+              return h('div', params.row.salePrice * params.row.goodsCount)
+            }
           },
           {
             title: '下单时间',
-            key: ''
+            key: 'createTimeStr'
           },
           {
-            title: '取消',
-            key: ''
+            title: '取消时间',
+            key: 'cancelTimeStr'
           },
           {
             title: '支付方式',
@@ -91,12 +98,18 @@
       queryWrapper,
       btnWrapper
     },
-    mixins: [table, page],
+    mixins: [table, page, countPrice],
+    created () {
+      this.getReportList()
+      this.getCount()
+      this.sumDate()
+    },
     methods: {
       getReportList () {
-        alreadyPaid.getReportList({
+        getFinanceList({
           pageNo: this.pageNo,
-          pageSize: this.pageSize,
+          pageSize: 10,
+          orderState: 9,
           ...this.queryArgs
         }).then(data => {
           if (data !== 'isError') {
@@ -105,11 +118,32 @@
           }
         })
       },
+      getCount () {
+        getFinanceCount({
+          searchType: 1,
+          orderState: 9
+        }).then(data => {
+          if (data !== 'isError') {
+            this.countPrice = data || 0
+          }
+        })
+      },
+      getMonthCount () {
+        getFinanceCount({
+          searchType: 1,
+          orderState: 9,
+          searchTime: this.requestDateStr
+        }).then(data => {
+          if (data !== 'isError') {
+            this.monthPrice = data || 0
+          }
+        })
+      },
       orderStartChange(time) {
-        this.queryArgs.startTime = time
+        this.queryArgs.cancelStartTime = time
       },
       orderEndChange(time) {
-        this.queryArgs.endTime = time
+        this.queryArgs.cancelEndTime = time
       },
       btnClick(handleName) {
 
@@ -142,8 +176,14 @@
     color: #444;
     overflow: hidden;
     .count-name {
-      margin-top: 15px;
+      margin: 15px 0 5px;
       font-size: 14px;
+    }
+    .flex-wrapper {
+      padding: 0 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .count-price {
       font-size: 16px;

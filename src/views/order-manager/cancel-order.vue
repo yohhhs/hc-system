@@ -23,7 +23,7 @@
       v-model="lookModal"
       :mask-closable="false"
       title="查看订单详情">
-      <order-edit v-if="lookModal" :detail="currentDetail"></order-edit>
+      <order-edit v-if="lookModal" :detail="currentDetail" :isCancel="true"></order-edit>
       <div slot="footer">
       </div>
     </Modal>

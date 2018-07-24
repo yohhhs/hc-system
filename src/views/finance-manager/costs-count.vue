@@ -2,12 +2,16 @@
   <div class="costs-count">
     <div class="count-money">
       <div class="count-item">
-        <p class="count-name">当月交易成本</p>
-        <p class="count-price"><span style="font-weight: bold;">234234</span> 元</p>
+        <p class="count-name">总计交易成本</p>
+        <p class="count-price"><span style="font-weight: bold;">{{countPrice}}</span> 元</p>
       </div>
       <div class="count-item">
-        <p class="count-name">总计交易成本</p>
-        <p class="count-price"><span style="font-weight: bold;">234234</span> 元</p>
+        <p class="count-name flex-wrapper">
+          <Icon style="cursor: pointer" type="arrow-left-b" @click="subtractDate"></Icon>
+          {{showDateStr}}
+          <Icon style="cursor: pointer" type="arrow-right-b" @click="addDate"></Icon>
+        </p>
+        <p class="count-price"><span style="font-weight: bold;">{{monthPrice}}</span> 元</p>
       </div>
     </div>
     <query-wrapper @userQuery="queryList">
@@ -29,16 +33,16 @@
 <script>
   import queryWrapper from '@/components/query-wrapper'
   import btnWrapper from '@/components/btn-wrapper'
-  import {table, page} from '@/common/js/mixins'
+  import {table, page, countPrice} from '@/common/js/mixins'
+  import {getFinanceList, getFinanceCount} from '@/api/request'
 
   export default {
     data() {
       return {
         queryArgs: {
           keyword: '',
-          startTime: '',
-          endTime: '',
-          payType: ''
+          payStartTime: '',
+          payEndTime: ''
         },
         payTypeList: [
           {
@@ -52,32 +56,40 @@
         ],
         tableColumns: [
           {
-            title: '订单id',
-            key: ''
+            title: '订单编号',
+            key: 'purchaseOrderNumber'
           },
           {
             title: '订单商品',
-            key: ''
+            key: 'goodsName'
           },
           {
             title: '采购数量',
-            key: ''
+            key: 'goodsCount'
           },
           {
             title: '订单金额',
-            key: ''
+            render: (h, params) => {
+              return h('div', params.row.salePrice * params.row.goodsCount)
+            }
           },
           {
             title: '成本比例',
-            key: ''
+            render: (h, params) => {
+              let bl =  params.row.buyCost/ params.row.salePrice * 100 + ''
+              if (bl.indexOf('.') > -1) {
+                bl = (bl * 1).toFixed(2)
+              }
+              return h('div', params.row.buyCost/ params.row.salePrice * 100 + '%')
+            }
           },
           {
             title: '交易成本',
-            key: ''
+            key: 'buyCost'
           },
           {
             title: '支付完成时间',
-            key: ''
+            key: 'payTimeStr'
           }
         ]
       }
@@ -86,12 +98,19 @@
       queryWrapper,
       btnWrapper
     },
-    mixins: [table, page],
+    mixins: [table, page, countPrice],
+    created () {
+      this.getReportList()
+      this.getCount()
+      this.sumDate()
+    },
     methods: {
       getReportList () {
-        alreadyPaid.getReportList({
+        getFinanceList({
           pageNo: this.pageNo,
-          pageSize: this.pageSize,
+          pageSize: 10,
+          orderState: 4,
+          payType: 1,
           ...this.queryArgs
         }).then(data => {
           if (data !== 'isError') {
@@ -100,11 +119,32 @@
           }
         })
       },
+      getCount () {
+        getFinanceCount({
+          searchType: 2,
+          orderState: 4
+        }).then(data => {
+          if (data !== 'isError') {
+            this.countPrice = data || 0
+          }
+        })
+      },
+      getMonthCount () {
+        getFinanceCount({
+          searchType: 2,
+          orderState: 4,
+          searchTime: this.requestDateStr
+        }).then(data => {
+          if (data !== 'isError') {
+            this.monthPrice = data || 0
+          }
+        })
+      },
       orderStartChange(time) {
-        this.queryArgs.startTime = time
+        this.queryArgs.payStartTime = time
       },
       orderEndChange(time) {
-        this.queryArgs.endTime = time
+        this.queryArgs.payEndTime = time
       },
       btnClick(handleName) {
 
@@ -137,11 +177,17 @@
     color: #444;
     overflow: hidden;
     .count-name {
-      margin-top: 15px;
+      margin: 15px 0 5px;
       font-size: 14px;
     }
     .count-price {
       font-size: 16px;
     }
+  }
+  .flex-wrapper {
+    padding: 0 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 </style>

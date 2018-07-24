@@ -92,3 +92,48 @@ export const writeModal = {
     }
   }
 }
+export const countPrice = {
+  data () {
+    return {
+      showDateStr: '',
+      requestDateStr: '',
+      currentDate: [],
+      countPrice: '',
+      monthPrice: ''
+    }
+  },
+  methods: {
+    sumDate () {
+      let date = new Date()
+      let year = date.getFullYear()
+      let month = date.getMonth() + 1
+      this.currentDate= [year, month]
+      this.formatTime()
+    },
+    formatTime () {
+      this.showDateStr = `${this.currentDate[0]}年${this.currentDate[1]}月`
+      this.requestDateStr = this.currentDate.map(this.formatNumber).join('-')
+      this.getMonthCount()
+    },
+    formatNumber (n) {
+      n = n.toString()
+      return n[1] ? n : '0' + n
+    },
+    subtractDate () {
+      this.currentDate[1]--
+      if (this.currentDate[1] < 1) {
+        this.currentDate[0]--
+        this.currentDate[1] = 12
+      }
+      this.formatTime()
+    },
+    addDate () {
+      this.currentDate[1]++
+      if (this.currentDate[1] > 12) {
+        this.currentDate[0]++
+        this.currentDate[1] = 1
+      }
+      this.formatTime()
+    }
+  }
+}
