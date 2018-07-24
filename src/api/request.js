@@ -271,6 +271,18 @@ export const getPurchaseGoodsCountList = params => {
 export const getGoodsCountDetail = params => {
   return instance.post('/business/getPurchaseGoodsOrderList', params)
 }
+// 交易数据统计
+export const getDataCount = params => {
+  return instance.post('/business/getSaleDepartmentMoney', params)
+}
+// 分月交易数据统计
+export const getMonthDataCount = params => {
+  return instance.post('/business/getSaleDepartmentMoneyByMonth', params)
+}
+export const dealCount = {
+  getDataCount,
+  getMonthDataCount
+}
 export const collectCount = {
   getPurchaseGoodsCountList,
   getGoodsCountDetail

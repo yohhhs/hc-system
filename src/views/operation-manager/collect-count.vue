@@ -10,19 +10,21 @@
       width="1000"
       :mask-closable="false"
       title="营业部订购明细">
-      <div>
-        <p></p>
-        <p></p>
+      <div v-if="lookModal" class="order-info">
+        <p class="goods-name">{{saleInfo.goodsName }}</p>
+        <p class="goods-info">
+          <span style="margin-right: 20px">起订量：{{saleInfo.purchaseMinCount }}</span>
+          <span>集采到期时间：{{saleInfo.purchaseEndTime }}</span>
+        </p>
       </div>
-      <ul>
-        <li>
-          <p>
-            <span></span>
-            <span></span>
+      <ul v-if="lookModal">
+        <li v-for="item in saleList" class="sale-item">
+          <p class="sale-title">
+            <span class="sale-name">{{item.organizeName + ' ' + item.companyName + ' ' + item.saleDepartmentName }}</span>
+            <span class="order-number">当前订购数量：{{item.purchaseOrderCount}}</span>
           </p>
-          <Table :columns="tableColumns" :loading="tableLoading" :data="tableData"></Table>
+          <Table :columns="saleColumns" :data="item.orderList"></Table>
         </li>
-
       </ul>
       <div slot="footer"></div>
     </Modal>
@@ -35,9 +37,48 @@
   export default {
     data () {
       return {
-        lookModal: true,
+        lookModal: false,
         lookDetail: false,
-
+        saleInfo: null,
+        saleList: null,
+        saleColumns: [
+          {
+            title: '订单编号',
+            key: 'purchaseOrderNumber'
+          },
+          {
+            title: '订单数量',
+            key: 'goodsCount'
+          },
+          {
+            title: '下单用户',
+            key: 'agentMemberName'
+          },
+          {
+            title: '用户手机号',
+            key: 'agentMemberMobile'
+          },
+          {
+            title: '支付方式',
+            render: (h, params) => {
+              return h('div', params.row.payType === 1 ? '线上' : '线下')
+            }
+          },
+          {
+            title: '下单时间',
+            key: 'createTimeStr'
+          },
+          {
+            title: '支付时间',
+            key: 'payTime'
+          },
+          {
+            title: '订单金额',
+            render: (h, params) => {
+              return h('div', params.row.goodsCount * params.row.salePrice)
+            }
+          }
+        ],
         tableColumns: [
           {
             title: '集采商品id',
@@ -53,7 +94,7 @@
           },
           {
             title: '商品发布时间',
-            key: ''
+            key: 'createTimeStr'
           },
           {
             title: '集采到期时间',
@@ -83,6 +124,12 @@
                     click: () => {
                       collectCount.getGoodsCountDetail({
                         purchaseGoodsId: params.row.purchaseGoodsId
+                      }).then(data => {
+                        if (data !== 'isError') {
+                          this.saleInfo = params.row
+                          this.saleList = data
+                          this.lookModal = true
+                        }
                       })
                     }
                   }
@@ -120,5 +167,20 @@
     }
   }
 </script>
-<style lang="less">
+<style lang="less" scoped>
+  .order-info {
+    padding: 0 10px 10px;
+    font-size: 14px;
+    color: #444;
+    border-bottom: 2px solid #ddd;
+  }
+  .sale-item {
+    margin-bottom: 5px;
+  }
+  .sale-title {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
 </style>

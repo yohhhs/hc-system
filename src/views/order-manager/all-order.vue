@@ -33,7 +33,19 @@
       <div slot="footer">
       </div>
     </Modal>
-
+    <Modal
+      v-model="uploadModal"
+      :mask-closable="false"
+      width="300"
+      title="导入订单">
+      <div style="text-align: center">
+        <Upload :on-success="uploadSuccess" action="https://www.topasst.com/cms/purchaseOrder/addPurchaseOrder">
+          <Button style="width: 200px" type="ghost" icon="ios-cloud-upload-outline">导入订单</Button>
+        </Upload>
+      </div>
+      <div slot="footer">
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -46,6 +58,7 @@
   export default {
     data () {
       return {
+        uploadModal: false,
         currentDetail: null,
         lookModal: false,
         selectIds: [],
@@ -233,7 +246,8 @@
               }
             })
             break
-          case '下载订单模板':
+          case '导入订单':
+            this.uploadModal = true
             break
         }
       },
@@ -256,6 +270,10 @@
       },
       payEndChange (time) {
         this.payEndTime = time
+      },
+      uploadSuccess () {
+        this.successInfo('导入成功')
+        this.getAllOrder()
       }
     }
   }
