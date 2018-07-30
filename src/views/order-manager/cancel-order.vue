@@ -73,6 +73,10 @@
             key: 'purchaseOrderNumber'
           },
           {
+            title: '集采商品编号',
+            key: 'purchaseGoodsNumber'
+          },
+          {
             title: '用户',
             key: 'agentMemberName'
           },

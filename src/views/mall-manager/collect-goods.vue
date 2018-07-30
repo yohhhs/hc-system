@@ -140,7 +140,6 @@
                   },
                   on: {
                     click: () => {
-                      console.log(1)
                       this.currentPurchaseGoodsId = params.row.purchaseGoodsId
                       collectGoods.getPurchaseGoodsDetail({
                         purchaseGoodsId: params.row.purchaseGoodsId

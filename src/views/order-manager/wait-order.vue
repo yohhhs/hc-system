@@ -58,6 +58,10 @@
             key: 'purchaseOrderNumber'
           },
           {
+            title: '集采商品编号',
+            key: 'purchaseGoodsNumber'
+          },
+          {
             title: '用户',
             key: 'agentMemberName'
           },
@@ -86,8 +90,18 @@
             }
           },
           {
+            title: '起订量',
+            render: (h, params) => {
+              return h('div', params.row.haveMinCount === 1 ? '达标' : '未达标')
+            }
+          },
+          {
             title: '下单时间',
             key: 'createTimeStr'
+          },
+          {
+            title: '集采结束时间',
+            key: 'purchaseEndTime'
           },
           {
             title: '操作',
@@ -124,6 +138,12 @@
                   },
                   on: {
                     click: () => {
+                      if (params.row.haveMinCount === 0) {
+                        return this.warningInfo(`起订量未达标，还需购买${params.row.notHaveCount}个`)
+                      }
+                      if (params.row.canSend === 0 ) {
+                        return this.warningInfo('集采时间未结束')
+                      }
                       this.$Modal.confirm({
                         content: '确定要发货吗？',
                         loading: true,
@@ -141,7 +161,35 @@
                       })
                     }
                   }
-                }, '确认发货')
+                }, '确认发货'),
+                h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    margin: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.$Modal.confirm({
+                        content: '确定要退款吗？',
+                        loading: true,
+                        onOk: () => {
+                          allOrder.returnPay({
+                            purchaseOrderId: params.row.purchaseOrderId
+                          }).then(data => {
+                            this.$Modal.remove()
+                            if (data !== 'isError') {
+                              this.successInfo('退款成功')
+                              this.getAllOrder()
+                            }
+                          })
+                        }
+                      })
+                    }
+                  }
+                }, '退款')
               ])
             }
           }
@@ -185,6 +233,18 @@
           case '批量发货':
             if (this.selectIds.length === 0) {
               return this.warningInfo('请选择操作对象')
+            }
+            let canSend = true
+            this.selectIds.forEach(item => {
+              let order = this.tableData.find(data => {
+                return data.purchaseOrderId = item
+              })
+              if (order.haveMinCount === 0 || order.canSend === 0) {
+                canSend = false
+              }
+            })
+            if (!canSend) {
+              return this.warningInfo('存在不能发货订单')
             }
             this.$Modal.confirm({
               content: '确定要发货吗？',

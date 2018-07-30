@@ -279,6 +279,10 @@ export const getDataCount = params => {
 export const getMonthDataCount = params => {
   return instance.post('/business/getSaleDepartmentMoneyByMonth', params)
 }
+// 退款
+export const returnPay = params => {
+  return instance.post('/purchaseOrder/refundOrder', params)
+}
 export const dealCount = {
   getDataCount,
   getMonthDataCount
@@ -336,7 +340,8 @@ export const allOrder = {
   closeOrder,
   orderDetail,
   getOrderList,
-  sendOrder
+  sendOrder,
+  returnPay
 }
 export const organizeManager = {
   addCompany,

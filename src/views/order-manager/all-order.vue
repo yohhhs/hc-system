@@ -39,7 +39,7 @@
       width="300"
       title="导入订单">
       <div style="text-align: center">
-        <Upload :on-success="uploadSuccess" action="https://www.topasst.com/cms/purchaseOrder/addPurchaseOrder">
+        <Upload :on-success="uploadSuccess" :format="['xls']" action="https://www.topasst.com/cms/purchaseOrder/addPurchaseOrder" :on-format-error="formatHandle">
           <Button style="width: 200px" type="ghost" icon="ios-cloud-upload-outline">导入订单</Button>
         </Upload>
       </div>
@@ -101,6 +101,10 @@
           {
             title: '订单编号',
             key: 'purchaseOrderNumber'
+          },
+          {
+            title: '集采商品编号',
+            key: 'purchaseGoodsNumber'
           },
           {
             title: '用户',
@@ -246,6 +250,9 @@
               }
             })
             break
+          case '下载订单模板':
+            window.location.href = 'https://www.topasst.com/excelFile/order_mode.xls'
+            break
           case '导入订单':
             this.uploadModal = true
             break
@@ -271,9 +278,16 @@
       payEndChange (time) {
         this.payEndTime = time
       },
-      uploadSuccess () {
-        this.successInfo('导入成功')
+      uploadSuccess (res) {
+        if (res.statusCode == 200) {
+          this.successInfo('导入成功')
+        } else if (res.statusCode == 412) {
+          window.location.href = res.data
+        }
         this.getAllOrder()
+      },
+      formatHandle () {
+        this.warningInfo('文件格式不正确')
       }
     }
   }

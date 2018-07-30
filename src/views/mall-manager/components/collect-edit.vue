@@ -49,7 +49,7 @@
         </Select>
       </div>
     </div>
-    <div v-if="!isLook" class="modal-input-item">
+    <div v-if="!isWrite" class="modal-input-item">
       <p class="label">关联营业部</p>
       <div>
         <Select style="width: 180px;margin: 0 15px 15px 0" v-model="currentOrganizeId" placeholder="请选择机构" @on-change="orgChange">
@@ -139,7 +139,7 @@
                     props: {
                       type: 'error',
                       size: 'small',
-                      disabled: this.isLook
+                      disabled: this.isWrite
                     },
                     on: {
                       click: () => {
@@ -185,7 +185,8 @@
                   h('Button', {
                     props: {
                       type: 'primary',
-                      size: 'small'
+                      size: 'small',
+                      disabled: this.isWrite
                     },
                     on: {
                       click: () => {
@@ -216,6 +217,7 @@
     methods: {
       orgChange (id) {
         this.currentCompanyId = ''
+        this.companyLists = []
         companyList({
           organizeId: this.currentOrganizeId,
           parentId: 0
@@ -223,7 +225,6 @@
           if (data !== 'isError') {
             if (data.length === 0) {
               this.warningInfo('没有下级子公司')
-              this.companyLists = []
             } else {
               this.companyLists.push({
                 companyId: '',
