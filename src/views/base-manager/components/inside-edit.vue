@@ -135,6 +135,7 @@
     methods: {
       orgChange (id) {
         this.currentCompanyId = ''
+        this.companyLists = []
         companyList({
           organizeId: this.currentOrganizeId,
           parentId: 0
@@ -142,7 +143,6 @@
           if (data !== 'isError') {
             if (data.length === 0) {
               this.warningInfo('没有下级子公司')
-              this.companyLists = []
             } else {
               this.companyLists.push({
                 companyId: '',
@@ -180,7 +180,7 @@
       getSaleList (id) {
         this.openTableLoading()
         getInsideSaleList({
-          insideMemberId: this.detail.insideMemberId || '',
+          insideMemberId: this.detail ? this.detail.insideMemberId : '',
           companyId: id
         }).then(data => {
           this.closeTableLoading()
