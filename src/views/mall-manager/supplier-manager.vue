@@ -186,13 +186,13 @@
         let returnData = this.$refs.writeEdit.returnData()
         if (returnData) {
           this.openWriteLoading()
-          supplierManager.addSupplier({
+          supplierManager.updateSupplier({
             supplierId: this.currentId,
             ...returnData
         }).then(data => {
             this.closeWriteLoading()
           if (data !== 'isError') {
-            this.successInfo('添加成功')
+            this.successInfo('修改成功')
             this.getSupplierList()
             this.closeWriteModal()
           }

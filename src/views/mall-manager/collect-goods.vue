@@ -97,8 +97,8 @@
             align: 'center'
           },
           {
-            title: '集采商品id',
-            key: 'purchaseGoodsId'
+            title: '集采商品编号',
+            key: 'purchaseOrderNumber'
           },
           {
             title: '商品名称',

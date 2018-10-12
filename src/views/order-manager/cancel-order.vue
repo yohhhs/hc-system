@@ -10,7 +10,7 @@
         class="query-item"
         type="datetime" placeholder="取消结束时间"
         clearable @on-change="cancelEndChange"></DatePicker>
-      <Select class="query-item" v-model="queryArgs.cancelType" placeholder="请选择取消类别">
+      <Select class="query-item" v-model="queryArgs.cancelType" placeholder="请选择取消类别" clearable>
         <Option v-for="item in cancelTypeList" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
     </query-wrapper>

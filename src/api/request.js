@@ -283,6 +283,25 @@ export const getMonthDataCount = params => {
 export const returnPay = params => {
   return instance.post('/purchaseOrder/refundOrder', params)
 }
+// 查询有未发货的营业部
+export const getNotSendSale = params => {
+  return instance.post('/purchaseOrder/getNotSendSaleDepartment', params)
+}
+// 查询营业部未发货的订单
+export const getNotSendOrder = params => {
+  return instance.post('/purchaseOrder/getNotSendPurchaseGoods', params)
+}
+// 一键发货
+export const oneTapSend = params => {
+  return instance.post('/purchaseOrder/sendOrderByGoods', params)
+}
+export const sendOrderPage = {
+  getNotSendSale,
+  getNotSendOrder,
+  oneTapSend,
+  getOrderList
+}
+
 export const dealCount = {
   getDataCount,
   getMonthDataCount

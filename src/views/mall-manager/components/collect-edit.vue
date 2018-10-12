@@ -32,7 +32,7 @@
         <DatePicker
           :value="purchaseEndTime"
           style="width: 350px"
-          type="datetime" placeholder="集采结到期时间" @on-change="endChange" :disabled="isLook"></DatePicker>
+          type="datetime" placeholder="集采结到期时间" @on-change="endChange" :disabled="isLook" :readonly="isLook"></DatePicker>
       </div>
     </div>
     <div class="modal-input-item">

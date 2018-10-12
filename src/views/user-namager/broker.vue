@@ -20,14 +20,19 @@
     <btn-wrapper @btnClick="btnClick"></btn-wrapper>
     <Table :columns="tableColumns" :loading="tableLoading" :data="tableData" @on-selection-change="tableSelectChange"></Table>
     <Page style="margin-top: 20px;text-align: center;" :current="pageNo" :total="total" show-elevator @on-change='changePage'></Page>
-    <!--<Modal
-      v-model="writeModal.isShow"
+    <Modal
+      v-model="uploadModal"
       :mask-closable="false"
-      title="">
-      <div slot="footer">
-        <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
+      width="300"
+      title="导入经纪人">
+      <div style="text-align: center">
+        <Upload :on-success="uploadSuccess" :format="['xls']" action="https://www.topasst.com/cms/agentMember/addAgentMember" :on-format-error="formatHandle">
+          <Button style="width: 200px" type="ghost" icon="ios-cloud-upload-outline">导入经纪人</Button>
+        </Upload>
       </div>
-    </Modal>-->
+      <div slot="footer">
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -38,6 +43,7 @@
   export default {
     data () {
       return {
+        uploadModal: false,
         memberType: [
           {
             id: 1,
@@ -143,6 +149,9 @@
           case '锁定':
             this.updateStatus(0)
             break
+          case '导入经纪人':
+            this.uploadModal = true
+            break
         }
       },
       updateStatus (status) {
@@ -180,6 +189,17 @@
       changePage (no) {
         this.pageNo = no
         this.getBrokerList()
+      },
+      uploadSuccess (res) {
+        if (res.statusCode == 200) {
+          this.successInfo('导入成功')
+          this.getBrokerList()
+        } else if (res.statusCode == 412) {
+          window.location.href = res.data
+        }
+      },
+      formatHandle () {
+        this.warningInfo('文件格式不正确')
       }
     }
   }

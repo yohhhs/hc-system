@@ -18,7 +18,7 @@
         class="query-item"
         type="datetime" placeholder="支付结束时间"
         clearable @on-change="payEndChange"></DatePicker>
-      <Select class="query-item" v-model="queryArgs.orderState" placeholder="请选择订单状态">
+      <Select class="query-item" v-model="queryArgs.orderState" placeholder="请选择订单状态" clearable>
         <Option v-for="item in orderStatusList" :value="item.id" :key="item.id">{{ item.name }}</Option>
       </Select>
     </query-wrapper>
