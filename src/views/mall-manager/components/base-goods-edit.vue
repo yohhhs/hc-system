@@ -51,7 +51,7 @@
           :withCredentials="true"
           :on-success="imgListSuccess"
           action="https://www.topasst.com/cms/file/uploadFile">
-          <Button type="ghost" icon="ios-cloud-upload-outline">上传商品缩略图</Button>
+          <Button type="primary" ghost icon="ios-cloud-upload-outline">上传商品缩略图</Button>
         </Upload>
       </div>
     </div>

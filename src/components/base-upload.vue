@@ -20,16 +20,16 @@
           :on-format-error="FormatError"
           action="https://www.topasst.com/cms/file/uploadFile"
         >
-          <Button type="ghost" icon="ios-cloud-upload-outline">{{btnTip}}</Button>
+          <Button  type="primary" ghost icon="ios-cloud-upload-outline">{{btnTip}}</Button>
         </Upload>
-        <Button v-show="uploading" type="ghost" loading icon="ios-cloud-upload-outline">{{btnTip}}</Button>
+        <Button v-show="uploading" type="primary" ghost loading icon="ios-cloud-upload-outline">{{btnTip}}</Button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import {  message } from '../common/js/mixins.js'
+  import { message } from '../common/js/mixins.js'
 
   export default {
     props: {
