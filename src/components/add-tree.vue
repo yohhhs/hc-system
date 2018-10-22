@@ -3,14 +3,14 @@
     <li class="tree-list-item">
       <div class="level">
         <Button v-if="isFolder" class="toggle" type="text" @click="toggle" style="" :style="{transform : open ? 'rotateZ(90deg)' : 'rotateZ(0deg)'}">
-          <Icon type="arrow-right-b" size="18"></Icon>
+          <Icon type="md-arrow-dropright" size="18"></Icon>
         </Button>
         {{model.name}}
         <span class="level-name">
-          <Icon :style="iconStyle" color="#19be6b"  type="arrow-down-b" @click.native="addChild"/>
-          <Icon v-if="!isFolder" :style="iconStyle" color="#2D8cF0" type="plus" @click.native="addHandle"/>
-          <Icon :style="iconStyle" color="#f90" type="edit" @click.native="editRoute"/>
-          <Icon :style="iconStyle" color="#ed3f14" type="close" @click.native="closeRoute(model.route)"/>
+          <Icon :style="iconStyle" color="#19be6b"  type="md-arrow-dropdown" @click.native="addChild"/>
+          <Icon v-if="!isFolder" :style="iconStyle" color="#2D8cF0" type="md-add" @click.native="addHandle"/>
+          <Icon :style="iconStyle" color="#f90" type="md-create" @click.native="editRoute"/>
+          <Icon :style="iconStyle" color="#ed3f14" type="md-close" @click.native="closeRoute(model.route)"/>
         </span>
         <template v-if="hasHandle">
           <span
@@ -18,8 +18,8 @@
             v-dragging="{ item: item, list: model.handles, group: model.route}"
             class="level-handle">
           {{ item }}
-          <Icon :style="iconStyle" color="#f90" type="edit" @click.native="editHandle(i)"/>
-          <Icon :style="iconStyle" color="#ed3f14" type="close" @click.native="closeHandle(i)"/>
+          <Icon :style="iconStyle" color="#f90" type="md-create" @click.native="editHandle(i)"/>
+          <Icon :style="iconStyle" color="#ed3f14" type="md-close" @click.native="closeHandle(i)"/>
         </span>
         </template>
       </div>
@@ -269,6 +269,7 @@
     &-item {
       padding-left: 40px;
       margin: 15px 0;
+      list-style: none;
       .level {
         position: relative;
         line-height: 35px;

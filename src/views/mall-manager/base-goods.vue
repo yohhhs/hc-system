@@ -13,11 +13,8 @@
           type="datetime" placeholder="结束时间"
           clearable
           @on-change="queryEndTimeChange"></DatePicker>
-        <Select  class="query-item" placeholder="商品状态" v-model="queryArgs.goodsState" clearable>
+        <Select  class="query-item" placeholder="商品状态" v-model="queryArgs.goodsStatus" clearable>
           <Option v-for="item in staticData.goodsType" :value="item.id" :key="item.id">{{ item.name }}</Option>
-        </Select>
-        <Select  class="query-item" placeholder="品牌" v-model="queryArgs.brandId" clearable>
-          <Option v-for="item in brandList" :value="item.infoId" :key="item.infoId">{{ item.infoValue }}</Option>
         </Select>
       </query-wrapper>
       <btn-wrapper @btnClick="btnClick"></btn-wrapper>
@@ -28,7 +25,7 @@
         :mask-closable="false"
         :width="800"
         title="添加基础商品">
-        <base-goods-edit v-if="addModal.isShow" ref="addEdit" :brandList="brandList" :supplierList="supplierList"></base-goods-edit>
+        <base-goods-edit v-if="addModal.isShow" ref="addEdit" :supplierList="supplierList"></base-goods-edit>
         <div slot="footer">
           <Button type="primary" size="large" long :loading="addModal.loading"  @click="addConfirm">确定</Button>
         </div>
@@ -38,7 +35,7 @@
         :mask-closable="false"
         :width="800"
         title="修改基础商品">
-        <base-goods-edit v-if="writeModal.isShow" ref="writeEdit" :isWrite="true" :detail="detail" :brandList="brandList" :supplierList="supplierList"></base-goods-edit>
+        <base-goods-edit v-if="writeModal.isShow" ref="writeEdit" :isWrite="true" :detail="detail" :supplierList="supplierList"></base-goods-edit>
         <div slot="footer">
           <Button type="primary" size="large" long :loading="writeModal.loading"  @click="writeConfirm">确定</Button>
         </div>
@@ -48,7 +45,7 @@
         :mask-closable="false"
         :width="800"
         title="查看基础商品">
-        <base-goods-edit v-if="lookModal" :isLook="true" :isWrite="true" :detail="detail" :brandList="brandList" :supplierList="supplierList"></base-goods-edit>
+        <base-goods-edit v-if="lookModal" :isLook="true" :isWrite="true" :detail="detail" :supplierList="supplierList"></base-goods-edit>
         <div slot="footer">
         </div>
       </Modal>
@@ -70,12 +67,10 @@
           keyword: '',
           addStartTime: '',
           addEndTime: '',
-          goodsState: '',
-          brandId: ''
+          goodsStatus: ''
         },
         selectIds: [],
-        brandList: [],
-        supplierList: [],
+        goodsSpecial: [],
         staticData: {
           goodsType: [
             {
@@ -183,9 +178,7 @@
     },
     mixins: [table, message, addModal, writeModal, page],
     created () {
-      this.getBrandList()
       this.getGoodsList()
-      this.getSupplierList()
     },
     methods: {
       getGoodsList () {
@@ -201,19 +194,12 @@
         })
       },
       getSupplierList () {
-        baseGoods.getSupplierList({
+        baseGoods.getGoodsSpecialList({
           pageSize: 100000,
           pageNo: 1
         }).then(data => {
           if (data !== 'isError') {
             this.supplierList = data.list
-          }
-        })
-      },
-      getBrandList () {
-        baseGoods.getBrandList().then(data => {
-          if (data !== 'isError') {
-            this.brandList = data
           }
         })
       },
@@ -244,13 +230,13 @@
             break
         }
       } ,
-      updateStatus (goodsState) {
+      updateStatus (goodsStatus) {
         if (this.selectIds.length === 0) {
           return this.warningInfo('请选择操作对象')
         }
         baseGoods.updateGoodsStatus({
           goodsId: this.selectIds.toString(),
-          goodsState
+          goodsStatus
         }).then(data => {
           if (data !== 'isError') {
             this.successInfo('更新成功')

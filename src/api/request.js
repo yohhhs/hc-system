@@ -97,7 +97,7 @@ export const updateGoods = params => {
 }
 // 更新商品状态
 export const updateGoodsStatus = params => {
-  return instance.post('/goods/updateGoodsState', params)
+  return instance.post('/goods/updateGoodsStatus', params)
 }
 // 新增结构用户
 export const addOrganizeUser = params => {
@@ -295,6 +295,22 @@ export const getNotSendOrder = params => {
 export const oneTapSend = params => {
   return instance.post('/purchaseOrder/sendOrderByGoods', params)
 }
+// 获取专区列表
+export const getGoodsSpecialList = params => {
+  return instance.post('/goodsSpecial/getGoodsSpecialList', params)
+}
+// 添加专区
+export const addGoodsSpecial = params => {
+  return instance.post('/goodsSpecial/addGoodsSpecial', params)
+}
+// 修改专区状态
+export const updateStatus = params => {
+  return instance.post('/goodsSpecial/updateStatus', params)
+}
+// 修改专区
+export const updateGoodsSpecial = params => {
+  return instance.post('/goodsSpecial/updateGoodsSpecial', params)
+}
 export const sendOrderPage = {
   getNotSendSale,
   getNotSendOrder,
@@ -317,12 +333,11 @@ export const giftCount = {
 }
 export const baseGoods = {
   addGoods,
-  getBrandList,
+  getGoodsSpecialList,
   getGoodsDetail,
   getGoodsList,
   updateGoods,
-  updateGoodsStatus,
-  getSupplierList
+  updateGoodsStatus
 }
 export const organizeUser = {
   addOrganizeUser,
@@ -334,10 +349,10 @@ export const broker = {
   updateBrokerStatus
 }
 export const supplierManager = {
-  updateSupplier,
-  getSupplierList,
-  deleteSupplier,
-  addSupplier
+  getGoodsSpecialList,
+  addGoodsSpecial,
+  updateStatus,
+  updateGoodsSpecial
 }
 export const collectGoods = {
   addPurchaseGoods,

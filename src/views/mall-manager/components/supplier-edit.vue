@@ -1,28 +1,15 @@
 <template>
     <div class="supplier-edit">
-      <p>*号为必填项</p>
       <div class="modal-input-item">
-        <p class="label">供应商名称 *</p>
+        <p class="label"><span class="require-flag">*</span>商品专区名称</p>
         <div style="width: 350px">
-          <Input type="text" long v-model="supplierName" placeholder="请输入机构名称" />
+          <Input type="text" long v-model="name" placeholder="请输入商品专区名称" />
         </div>
       </div>
       <div class="modal-input-item">
-        <p class="label">供应商对接人 *</p>
+        <p class="label"><span class="require-flag">*</span>商品专区权重</p>
         <div style="width: 350px">
-          <Input type="text" long v-model="supplierMemberName" placeholder="请输入机构名称" />
-        </div>
-      </div>
-      <div class="modal-input-item">
-        <p class="label">对接人电话 *</p>
-        <div style="width: 350px">
-          <Input type="text" long v-model="mobile" placeholder="请输入机构名称" />
-        </div>
-      </div>
-      <div class="modal-input-item">
-        <p class="label">备注</p>
-        <div style="width: 350px">
-          <Input type="textarea" :rows="4" long v-model="remark" placeholder="请输入机构名称" />
+          <InputNumber style="width: 100%" :min="0" v-model="sort"></InputNumber>
         </div>
       </div>
     </div>
@@ -43,44 +30,37 @@
     },
     data () {
       return {
-        supplierName: '',
-        supplierMemberName: '',
-        mobile: '',
-        remark: ''
+        name: '',
+        sort: 0
       }
     },
     mixins: [message],
     created () {
       if (this.isWrite) {
-        this.supplierName = this.detail.supplierName
-        this.supplierMemberName = this.detail.supplierMemberName
-        this.mobile = this.detail.mobile
-        this.remark = this.detail.remark
+        this.name = this.detail.goodsSpecialName
+        this.sort = this.detail.sort
       }
     },
     methods: {
       returnData () {
-        if (this.supplierName === '') {
-          this.warningInfo('请输入供应商名称')
+        if (this.name === '') {
+          this.warningInfo('请输入商品专区名称')
           return false
         }
-        if (this.supplierMemberName === '') {
-          this.warningInfo('请输入供应商对接人名称')
-          return false
-        }
-        if (this.mobile === '') {
-          this.warningInfo('请输入对接人电话')
+        if (this.sort === '') {
+          this.warningInfo('请输入商品专区权重')
           return false
         }
         return {
-          supplierName: this.supplierName,
-          supplierMemberName: this.supplierMemberName,
-          mobile: this.mobile,
-          remark: this.remark
+          name: this.name,
+          sort: this.sort
         }
       }
     }
   }
 </script>
 <style lang="less" scope>
+  .modal-input-item .label {
+    width: 120px;
+  }
 </style>

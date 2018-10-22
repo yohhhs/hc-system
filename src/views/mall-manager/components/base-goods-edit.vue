@@ -7,48 +7,71 @@
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">商品名称</p>
+      <p class="label"><span class="require-flag">*</span>商品名称</p>
       <div style="width: 350px">
         <Input type="text" long v-model.trim="goodsName" placeholder="请输入商品名称" :disabled="isLook"/>
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">商品品牌</p>
+      <p class="label">所属专区</p>
       <div style="width: 350px">
-        <Select v-model="brandId" placeholder="选择商品品牌" :disabled="isLook">
-          <Option v-for="item in brandList" :value="item.infoId" :key="item.infoId">{{ item.infoValue }}</Option>
+        <Select v-model="goodsSpecialId" placeholder="选择商品所属专区" :disabled="isLook">
+          <Option v-for="item in supplierList" :value="item.goodsSpecialId" :key="item.goodsSpecialId">{{ item.goodsSpecialName }}</Option>
         </Select>
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">所属供应商</p>
+      <p class="label"><span class="require-flag">*</span>商品规格</p>
       <div style="width: 350px">
-        <Select v-model="supplierId" placeholder="选择供应商" :disabled="isLook">
-          <Option v-for="item in supplierList" :value="item.supplierId" :key="item.supplierId">{{ item.supplierName }}</Option>
-        </Select>
+        <Input type="text" long v-model.trim="standard" placeholder="请输入商品规格" :disabled="isLook"/>
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">采购成本</p>
+      <p class="label"><span class="require-flag">*</span>商品状态</p>
       <div style="width: 350px">
-        <InputNumber style="width: 100%" :min="0" v-model="buyCost" :disabled="isLook"></InputNumber>
-      </div>
-    </div>
-    <div class="modal-input-item">
-      <p class="label">商品状态</p>
-      <div style="width: 350px">
-        <Select v-model="goodsState" placeholder="选择商品状态" :disabled="isLook">
+        <Select v-model="goodsStatus" placeholder="选择商品状态" :disabled="isLook">
           <Option v-for="item in goodsStatusList" :value="item.id" :key="item.id">{{ item.name }}</Option>
         </Select>
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">商品缩略图</p>
+      <p class="label"><span class="require-flag">*</span>采购成本</p>
+      <div style="width: 350px">
+        <InputNumber style="width: 100%" :min="0" v-model="buyCost" :disabled="isLook"></InputNumber>
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label"><span class="require-flag">*</span>商品售价</p>
+      <div style="width: 350px">
+        <InputNumber style="width: 100%" :min="0" v-model="salePrice" :disabled="isLook"></InputNumber>
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label"><span class="require-flag">*</span>起订量</p>
+      <div style="width: 350px">
+        <InputNumber style="width: 100%" :min="0" v-model="minQuantity" :disabled="isLook"></InputNumber>
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label"><span class="require-flag">*</span>商品权重</p>
+      <div style="width: 350px">
+        <InputNumber style="width: 100%" :min="0" v-model="sort" :disabled="isLook"></InputNumber>
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label"><span class="require-flag">*</span>销量偏移</p>
+      <div style="width: 350px">
+        <InputNumber style="width: 100%" :min="0" v-model="salesVolumeFloat" :disabled="isLook"></InputNumber>
+      </div>
+    </div>
+    <div class="modal-input-item">
+      <p class="label"><span class="require-flag">*</span>商品缩略图</p>
       <div style="width: 650px">
         <Table style="margin-bottom: 20px" :columns="tableColumns" :loading="tableLoading" :data="tableData"></Table>
         <Upload
           v-show="!isLook"
-          :withCredentials="true"
+          withCredentials
+          name="files"
           :on-success="imgListSuccess"
           action="https://www.topasst.com/cms/file/uploadFile">
           <Button type="primary" ghost icon="ios-cloud-upload-outline">上传商品缩略图</Button>
@@ -56,7 +79,7 @@
       </div>
     </div>
     <div class="modal-input-item">
-      <p class="label">商品详情</p>
+      <p class="label"><span class="require-flag">*</span>商品详情</p>
       <div style="width: 350px">
         <img v-if="isLook" width="375" :src="oldCoverUrl">
         <base-upload v-if="!isLook" :oldCoverUrl="oldCoverUrl" btnTip="上传详情图片" @uploadSuccess="detailSuccess"></base-upload>
@@ -86,11 +109,7 @@
         type: Boolean,
         default: false
       },
-      brandList: {
-        type: Array,
-        default: () => []
-      },
-      supplierList: {
+      goodsSpecialList: {
         type: Array,
         default: () => []
       },
@@ -183,11 +202,17 @@
         ],
         goodsName: '',
         brandId: '',
+        sort: 0,
+        salePrice: 0,
         supplierId: '',
         buyCost: 0,
-        goodsState: '',
+        goodsStatus: '',
         description: '',
         imageListStr: '',
+        goodsSpecialId: '',
+        minQuantity: 0,
+        standard: '',
+        salesVolumeFloat: 0,
         goodsStatusList: [
           {
             id: 1,
@@ -207,10 +232,14 @@
     created () {
       if (this.isWrite) {
         this.goodsName = this.detail.goodsName
-        this.brandId = this.detail.brandId
-        this.supplierId = this.detail.supplierId
         this.buyCost = this.detail.buyCost
-        this.goodsState = this.detail.goodsState
+        this.standard = this.detail.standard
+        this.salePrice = this.detail.salePrice
+        this.minQuantity = this.detail.minQuantity
+        this.sort = this.detail.sort
+        this.salesVolumeFloat = this.detail.salesVolumeFloat
+        this.goodsSpecialId = this.detail.goodsSpecialId
+        this.goodsStatus = this.detail.goodsStatus
         this.tableData = this.detail.imageList
         this.description = this.detail.description
         this.oldCoverUrl = this.detail.description
@@ -232,16 +261,32 @@
           this.warningInfo('商品名称')
           return false
         }
-        if (this.brandId === '') {
-          this.warningInfo('请选择品牌')
+        if (this.standard === '') {
+          this.warningInfo('请输入商品规格')
           return false
         }
-        if (this.supplierId === '') {
-          this.warningInfo('请选择供应商')
+        if (this.goodsStatus === '') {
+          this.warningInfo('请选择商品状态')
           return false
         }
-        if (this.goodsState === '') {
-          this.warningInfo('请选择状态')
+        if (this.buyCost === '') {
+          this.warningInfo('请输入采购成本')
+          return false
+        }
+        if (this.salePrice === '') {
+          this.warningInfo('请输入商品售价')
+          return false
+        }
+        if (this.minQuantity === '') {
+          this.warningInfo('请输入起订量')
+          return false
+        }
+        if (this.sort === '') {
+          this.warningInfo('请输入商品权重')
+          return false
+        }
+        if (this.salesVolumeFloat === '') {
+          this.warningInfo('请输入销量偏移')
           return false
         }
         if (this.tableData.length === 0) {
@@ -258,11 +303,15 @@
         })
         return {
           goodsName: this.goodsName,
-          brandId: this.brandId,
-          supplierId: this.supplierId,
           buyCost: this.buyCost,
-          goodsState: this.goodsState,
+          goodsStatus: this.goodsStatus,
           description: this.description,
+          standard: this.standard,
+          salePrice: this.salePrice,
+          minQuantity: this.minQuantity,
+          sort: this.sort,
+          goodsSpecialId: this.goodsSpecialId,
+          salesVolumeFloat: this.salesVolumeFloat,
           imageListStr: str.join(';')
         }
       }

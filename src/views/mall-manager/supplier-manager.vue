@@ -1,7 +1,10 @@
 <template>
   <div class="supplier-manager">
     <query-wrapper @userQuery="queryList">
-      <Input class="query-item" v-model="queryArgs.name" placeholder="供应商名称" />
+      <Input class="query-item" v-model="queryArgs.keyword" placeholder="关键字" />
+      <Select  class="query-item" placeholder="专区状态" v-model="queryArgs.goodsStatus" clearable>
+        <Option v-for="item in statusList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+      </Select>
     </query-wrapper>
     <btn-wrapper @btnClick="btnClick"></btn-wrapper>
     <Table :columns="tableColumns" :loading="tableLoading" :data="tableData" @on-selection-change="tableSelectChange"></Table>
@@ -36,9 +39,19 @@
   export default {
     data () {
       return {
+        statusList: [
+          {
+            id: 0,
+            name: '停用'
+          },
+          {
+            id: 1,
+            name: '启用'
+          }
+        ],
         supplierDetail: null,
         currentId: '',
-        deleteIds: [],
+        selectIds: [],
         queryArgs: {
           name: ''
         },
@@ -49,24 +62,34 @@
             align: 'center'
           },
           {
-            title: '供应商ID',
-            key: 'supplierId'
+            title: '专区名称',
+            key: 'goodsSpecialName'
           },
           {
-            title: '供应商名称',
-            key: 'supplierName'
+            title: '专区权重',
+            key: 'sort'
           },
           {
-            title: '供应商对接人',
-            key: 'supplierMemberName'
+            title: '状态',
+            render: (h, params) => {
+              return h('div', params.row.status === 0 ? '停用' : '启用')
+            }
           },
           {
-            title: '联系电话',
-            key: 'mobile'
+            title: '创建时间',
+            key: 'createTimeStr'
           },
           {
-            title: '备注',
-            key: 'remark'
+            title: '创建人',
+            key: 'createName'
+          },
+          {
+            title: '更新时间',
+            key: 'updateTimeStr'
+          },
+          {
+            title: '更新人',
+            key: 'updateName'
           },
           {
             title: '操作',
@@ -82,7 +105,7 @@
                   },
                   on: {
                     click: () => {
-                      this.currentId = params.row.supplierId
+                      this.currentId = params.row.goodsSpecialId
                       this.supplierDetail = params.row
                       this.openWriteModal()
                     }
@@ -106,7 +129,7 @@
     methods: {
       getSupplierList () {
         this.openTableLoading()
-        supplierManager.getSupplierList({
+        supplierManager.getGoodsSpecialList({
           pageSize: 10,
           pageNo: this.pageNo,
           ...this.queryArgs
@@ -124,39 +147,37 @@
       },
       btnClick (handleName) {
         switch (handleName) {
-          case '添加供应商':
+          case '添加专区':
             this.openAddModal()
             break
-          case '删除':
-            if (this.deleteIds.length === 0) {
-              return this.warningInfo('请选择删除对象')
-            }
-            this.$Modal.confirm({
-              content: '确定要删除吗？',
-              loading: true,
-              onOk: () => {
-                supplierManager.deleteSupplier({
-                  supplierId: this.deleteIds.toString()
-                }).then(data => {
-                  if (data !== 'isError') {
-                    this.correctPageNo(this.deleteIds.length)
-                    this.getSupplierList()
-                    this.successInfo('删除成功')
-                    this.deleteIds = []
-                  }
-                  this.$Modal.remove()
-                })
-              }
-            })
+          case '启用':
+            this.updateStatus(1)
+            break
+          case '停用':
+            this.updateStatus(0)
             break
         }
+      },
+      updateStatus (goodsSpecialStatus) {
+        if (this.selectIds.length === 0) {
+          return this.warningInfo('请选择操作对象')
+        }
+        supplierManager.updateStatus({
+          goodsSpecialId: this.selectIds.toString(),
+          goodsSpecialStatus
+        }).then(data => {
+          if (data !== 'isError') {
+            this.successInfo('更新成功')
+            this.getSupplierList()
+          }
+        })
       },
       tableSelectChange (selection) {
         let ids = []
         selection.forEach(item => {
-          ids.push(item.supplierId)
+          ids.push(item.goodsSpecialId)
         })
-        this.deleteIds = ids
+        this.selectIds = ids
       },
       queryList () {
         this.pageNo = 1
@@ -170,7 +191,7 @@
         let returnData = this.$refs.addEdit.returnData()
         if (returnData) {
           this.openAddLoading()
-          supplierManager.addSupplier({
+          supplierManager.addGoodsSpecial({
             ...returnData
           }).then(data => {
             this.closeAddLoading()
@@ -186,8 +207,8 @@
         let returnData = this.$refs.writeEdit.returnData()
         if (returnData) {
           this.openWriteLoading()
-          supplierManager.updateSupplier({
-            supplierId: this.currentId,
+          supplierManager.updateGoodsSpecial({
+            goodsSpecialId: this.currentId,
             ...returnData
         }).then(data => {
             this.closeWriteLoading()
