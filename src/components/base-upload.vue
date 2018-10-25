@@ -12,6 +12,7 @@
           ref="baseUpload"
           style="margin-top: 20px"
           v-show="!uploading"
+          name="files"
           :show-upload-list="false"
           :on-success="uploadSuccess"
           :on-error="uploadError"

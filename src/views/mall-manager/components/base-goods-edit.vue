@@ -41,6 +41,12 @@
       </div>
     </div>
     <div class="modal-input-item">
+      <p class="label"><span class="require-flag">*</span>商品原价</p>
+      <div style="width: 350px">
+        <InputNumber style="width: 100%" :min="0" v-model="realPrice" :disabled="isLook"></InputNumber>
+      </div>
+    </div>
+    <div class="modal-input-item">
       <p class="label"><span class="require-flag">*</span>商品售价</p>
       <div style="width: 350px">
         <InputNumber style="width: 100%" :min="0" v-model="salePrice" :disabled="isLook"></InputNumber>
@@ -72,6 +78,8 @@
           v-show="!isLook"
           withCredentials
           name="files"
+          accept="image/*"
+          :format="['jpg','jpeg','png']"
           :on-success="imgListSuccess"
           action="https://www.topasst.com/cms/file/uploadFile">
           <Button type="primary" ghost icon="ios-cloud-upload-outline">上传商品缩略图</Button>
@@ -109,7 +117,7 @@
         type: Boolean,
         default: false
       },
-      goodsSpecialList: {
+      supplierList: {
         type: Array,
         default: () => []
       },
@@ -204,6 +212,7 @@
         brandId: '',
         sort: 0,
         salePrice: 0,
+        realPrice: 0,
         supplierId: '',
         buyCost: 0,
         goodsStatus: '',
@@ -234,6 +243,7 @@
         this.goodsName = this.detail.goodsName
         this.buyCost = this.detail.buyCost
         this.standard = this.detail.standard
+        this.realPrice = this.detail.realPrice
         this.salePrice = this.detail.salePrice
         this.minQuantity = this.detail.minQuantity
         this.sort = this.detail.sort
@@ -273,6 +283,10 @@
           this.warningInfo('请输入采购成本')
           return false
         }
+        if (this.realPrice === '') {
+          this.warningInfo('请输入商品原价')
+          return false
+        }
         if (this.salePrice === '') {
           this.warningInfo('请输入商品售价')
           return false
@@ -307,6 +321,7 @@
           goodsStatus: this.goodsStatus,
           description: this.description,
           standard: this.standard,
+          realPrice: this.realPrice,
           salePrice: this.salePrice,
           minQuantity: this.minQuantity,
           sort: this.sort,

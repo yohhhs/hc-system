@@ -70,7 +70,7 @@
           goodsStatus: ''
         },
         selectIds: [],
-        goodsSpecial: [],
+        supplierList: [],
         staticData: {
           goodsType: [
             {
@@ -179,6 +179,7 @@
     mixins: [table, message, addModal, writeModal, page],
     created () {
       this.getGoodsList()
+      this.getSupplierList()
     },
     methods: {
       getGoodsList () {
