@@ -40,7 +40,7 @@
       title="导入订单">
       <div style="text-align: center">
         <Upload :on-success="uploadSuccess" :format="['xls']" action="https://www.topasst.com/cms/purchaseOrder/addPurchaseOrder" :on-format-error="formatHandle">
-          <Button style="width: 200px" type="ghost" icon="ios-cloud-upload-outline">导入订单</Button>
+          <Button style="width: 200px" type="primary" ghost icon="ios-cloud-upload-outline">导入订单</Button>
         </Upload>
       </div>
       <div slot="footer">
@@ -101,18 +101,6 @@
           {
             title: '订单编号',
             key: 'purchaseOrderNumber'
-          },
-          {
-            title: '集采商品编号',
-            key: 'purchaseGoodsNumber'
-          },
-          {
-            title: '用户',
-            key: 'agentMemberName'
-          },
-          {
-            title: '营业部',
-            key: 'saleDepartmentName'
           },
           {
             title: '订单状态',
@@ -250,8 +238,8 @@
               }
             })
             break
-          case '下载订单模板':
-            window.location.href = 'https://www.topasst.com/excelFile/order_mode.xls'
+          case '导出订单':
+            window.location.href = 'https://www.topasst.com/cms/purchaseOrder/getPurchaseOrderExcelList?orderState=' + this.queryArgs.orderState
             break
           case '导入订单':
             this.uploadModal = true
