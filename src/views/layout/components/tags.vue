@@ -4,7 +4,7 @@
       <template v-for="tag in tagsList">
         <Tag
           type="dot"
-          :color="tag[0] === currentRoute?'blue':''"
+          :color="tag[0] === currentRoute?'primary':''"
           :closable="tag[0] !== 'home-index'"
           style="margin-left: -3px"
           :name="tag[0]"
@@ -17,19 +17,19 @@
     </div>
     <div class="tags-go-left" @click="goLeft">
       <Button type="text" style="height: 101%">
-        <Icon type="chevron-left" size="20"></Icon>
+        <Icon type="ios-arrow-back" size="20"></Icon>
       </Button>
     </div>
     <div class="tags-go-right" @click="goRight">
       <Button type="text" style="height: 101%">
-        <Icon type="chevron-right" size="20"></Icon>
+        <Icon type="ios-arrow-forward" size="20"></Icon>
       </Button>
     </div>
     <div class="tags-btn">
       <Dropdown transfer @on-click="closePage">
         <Button type="primary" size="small">
           标签选项
-          <Icon type="arrow-down-b"></Icon>
+          <Icon type="md-arrow-dropdown"></Icon>
         </Button>
         <DropdownMenu slot="list">
           <DropdownItem name="other">关闭其他</DropdownItem>
@@ -104,7 +104,6 @@
       top: 0;
       bottom: 0;
       padding-left: 55px;
-      line-height: 40px;
       white-space: nowrap;
       transition: left 0.2s;
     }

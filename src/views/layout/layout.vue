@@ -12,9 +12,9 @@
         <Button style="float: right;margin-top: 14px;margin-right: 28px;" type="error" @click="loginOut">账号退出</Button>
         <span style="float: right;line-height: 60px;margin-right: 28px;">您好，管理员：admin</span>
       </div>
-      <!--<div class="tags-wrapper">
+      <div class="tags-wrapper">
         <tags @changeRoute="changePage"></tags>
-      </div>-->
+      </div>
     </div>
     <div class="main-page">
       <div class="single">
@@ -83,8 +83,10 @@
         /*box-shadow: 0 2px 1px 1px hsla(0,0%,39%,.1);*/
       }
       .tags-wrapper {
-        position: relative;
-        width: 100%;
+        position: fixed;
+        top: 60px;
+        left: 200px;
+        right: 0;
         height: 40px;
         background: #f0f0f0;
         overflow: hidden;
@@ -94,7 +96,7 @@
     }
     &-page {
      position: absolute;
-     top: 60px;
+     top: 100px;
      left: 200px;
      right: 0;
      bottom: 0;

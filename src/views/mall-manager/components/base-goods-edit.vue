@@ -325,7 +325,7 @@
           salePrice: this.salePrice,
           minQuantity: this.minQuantity,
           sort: this.sort,
-          goodsSpecialId: this.goodsSpecialId,
+          goodsSpecialId: this.goodsSpecialId ? this.goodsSpecialId : '',
           salesVolumeFloat: this.salesVolumeFloat,
           imageListStr: str.join(';')
         }

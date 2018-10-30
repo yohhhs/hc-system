@@ -98,16 +98,8 @@
             key: 'goodsName'
           },
           {
-            title: '品牌',
-            key: 'brandName'
-          },
-          {
             title: '采购成本',
             key: 'buyCost'
-          },
-          {
-            title: '供应商',
-            key: 'supplierName'
           },
           {
             title: '状态',
