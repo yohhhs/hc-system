@@ -129,7 +129,7 @@
           {
             title: '订单金额',
             render: (h, params) => {
-              return h('div', params.row.goodsCount * params.row.salePrice)
+              return h('div', params.row.goodsCount * 100 * params.row.salePrice / 100)
             }
           },
           {
@@ -153,35 +153,35 @@
           {
             title: '支付时间',
             key: 'payTime'
-          },
-          {
-            title: '操作',
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    margin: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      allOrder.orderDetail({
-                        purchaseOrderId: params.row.purchaseOrderId
-                      }).then(data => {
-                        if (data !== 'isError') {
-                          this.currentDetail = data
-                          this.lookModal = true
-                        }
-                      })
-                    }
-                  }
-                }, '查看')
-              ])
-            }
           }
+          // {
+          //   title: '操作',
+          //   render: (h, params) => {
+          //     return h('div', [
+          //       h('Button', {
+          //         props: {
+          //           type: 'primary',
+          //           size: 'small'
+          //         },
+          //         style: {
+          //           margin: '5px'
+          //         },
+          //         on: {
+          //           click: () => {
+          //             allOrder.orderDetail({
+          //               purchaseOrderId: params.row.purchaseOrderId
+          //             }).then(data => {
+          //               if (data !== 'isError') {
+          //                 this.currentDetail = data
+          //                 this.lookModal = true
+          //               }
+          //             })
+          //           }
+          //         }
+          //       }, '查看')
+          //     ])
+          //   }
+          // }
         ]
       }
     },

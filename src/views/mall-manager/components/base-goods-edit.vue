@@ -15,7 +15,7 @@
     <div class="modal-input-item">
       <p class="label">所属专区</p>
       <div style="width: 350px">
-        <Select v-model="goodsSpecialId" placeholder="选择商品所属专区" :disabled="isLook">
+        <Select v-model="goodsSpecialId" placeholder="选择商品所属专区" :disabled="isLook" clearable>
           <Option v-for="item in supplierList" :value="item.goodsSpecialId" :key="item.goodsSpecialId">{{ item.goodsSpecialName }}</Option>
         </Select>
       </div>

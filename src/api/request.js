@@ -311,6 +311,49 @@ export const updateStatus = params => {
 export const updateGoodsSpecial = params => {
   return instance.post('/goodsSpecial/updateGoodsSpecial', params)
 }
+// 添加地区负责人
+export const addManagerMember = params => {
+  params.password = md5(params.password)
+  return instance.post('/managerMember/addManagerMember', params)
+}
+// 地区负责人列表
+export const getManagerMemberList = params => {
+  return instance.post('/managerMember/getManagerMemberList', params)
+}
+// 更新地区负责人
+export const updateManagerMember = params => {
+  if (params.password !== '') {
+    params.password = md5(params.password)
+  }
+  return instance.post('/managerMember/updateManagerMember', params)
+}
+// 更新状态
+export const updateManagerStatus = params => {
+  return instance.post('/managerMember/updateStatus', params)
+}
+// 添加关联地址
+export const addManagerMemberArea = params => {
+  return instance.post('/managerMemberArea/addManagerMemberArea', params)
+}
+// 删除关联地址
+export const deleteManagerMemberArea = params => {
+  return instance.post('/managerMemberArea/deleteManagerMemberArea', params)
+}
+// 获取关联地址列表
+export const getManagerMemberAreaList = params => {
+  return instance.post('/managerMemberArea/getManagerMemberAreaList', params)
+}
+export const areaEdit = {
+  addManagerMemberArea,
+  deleteManagerMemberArea,
+  getManagerMemberAreaList
+}
+export const insideUser = {
+  addManagerMember,
+  getManagerMemberList,
+  updateManagerMember,
+  updateManagerStatus
+}
 export const sendOrderPage = {
   getNotSendSale,
   getNotSendOrder,
@@ -388,10 +431,4 @@ export const organizeManager = {
   updateSaleDepartment,
   getOrganizeUserList
 }
-export const insideUser = {
-  addInside,
-  getInsideList,
-  updateInside,
-  updateInsideStatus,
-  getOrganizeUserList
-}
+

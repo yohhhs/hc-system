@@ -112,7 +112,7 @@
           {
             title: '状态',
             render: (h, params) => {
-              return h('div', params.row.goodsState === 0 ? '下架' : '上架')
+              return h('div', params.row.goodsStatus === 0 ? '下架' : '上架')
             }
           },
           {
