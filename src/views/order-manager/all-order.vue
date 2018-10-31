@@ -1,7 +1,7 @@
 <template>
   <div class="all-order">
     <query-wrapper @userQuery="queryList">
-      <Input class="query-item" v-model="queryArgs.keyword" placeholder="用户姓名/商品名称" />
+      <Input class="query-item" v-model="queryArgs.keyword" placeholder="商品名称" />
       <DatePicker
         class="query-item"
         type="datetime" placeholder="下单开始时间"
@@ -64,8 +64,8 @@
         selectIds: [],
         queryArgs: {
           keyword: '',
-          addStartTime: '',
-          addEndTime: '',
+          orderStartTime: '',
+          orderEndTime: '',
           payStartTime: '',
           payEndTime: '',
           orderState: ''
@@ -93,11 +93,11 @@
           }
         ],
         tableColumns: [
-          {
-            type: 'selection',
-            width: 60,
-            align: 'center'
-          },
+          // {
+          //   type: 'selection',
+          //   width: 60,
+          //   align: 'center'
+          // },
           {
             title: '订单编号',
             key: 'purchaseOrderNumber'
@@ -255,10 +255,10 @@
         this.getAllOrder()
       },
       orderStartChange (time) {
-        this.addStartTime = time
+        this.orderStartTime = time
       },
       orderEndChange (time) {
-        this.addEndTime = time
+        this.orderEndTime = time
       },
       payStartChange (time) {
         this.payStartTime = time
