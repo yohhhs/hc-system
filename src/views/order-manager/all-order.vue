@@ -88,6 +88,10 @@
             name: '已收货'
           },
           {
+            id: 5,
+            name: '备货中'
+          },
+          {
             id: 9,
             name: '取消'
           }
@@ -119,8 +123,11 @@
                 case 4:
                   status = '已收货'
                   break
+                case 5:
+                  status = '备货中'
+                  break
                 case 9:
-                  status = '取消'
+                  status = '已取消'
                   break
               }
               return h('div', status)
