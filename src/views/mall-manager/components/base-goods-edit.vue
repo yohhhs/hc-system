@@ -76,6 +76,7 @@
         <Table style="margin-bottom: 20px" :columns="tableColumns" :loading="tableLoading" :data="tableData"></Table>
         <Upload
           v-show="!isLook"
+          ref="listUpload"
           withCredentials
           name="files"
           accept="image/*"
@@ -88,9 +89,23 @@
     </div>
     <div class="modal-input-item">
       <p class="label"><span class="require-flag">*</span>商品详情</p>
-      <div style="width: 350px">
-        <img v-if="isLook" width="375" :src="oldCoverUrl">
-        <base-upload v-if="!isLook" :oldCoverUrl="oldCoverUrl" btnTip="上传详情图片" @uploadSuccess="detailSuccess"></base-upload>
+      <div style="width: 670px">
+        <div v-for="item in description" class="detal-item-img-wrapper">
+          <img class="detal-item-img" :src="item">
+        </div>
+        <!--<img v-for="item in imgDetailList" width="375" :src="item">-->
+        <Upload
+          v-show="!isLook"
+          ref="detailUpload"
+          withCredentials
+          name="files"
+          accept="image/*"
+          :format="['jpg','jpeg','png']"
+          :on-success="imgDetailSuccess"
+          action="https://www.topasst.com/cms/file/uploadFile">
+          <Button type="primary" ghost icon="ios-cloud-upload-outline">上传商品详情图片</Button>
+        </Upload>
+        <!--<base-upload v-if="!isLook" :oldCoverUrl="oldCoverUrl" btnTip="上传详情图片" @uploadSuccess="detailSuccess"></base-upload>-->
       </div>
     </div>
     <!--<div v-if="isLook" class="modal-input-item">
@@ -105,6 +120,7 @@
 <script>
   import baseUpload from '@/components/base-upload'
   import {message, table} from '@/common/js/mixins'
+  import lrz from 'lrz'
 
   export default {
     name: "base-goods-edit",
@@ -216,12 +232,13 @@
         supplierId: '',
         buyCost: 0,
         goodsStatus: '',
-        description: '',
+        description: [],
         imageListStr: '',
         goodsSpecialId: '',
         minQuantity: 0,
         standard: '',
         salesVolumeFloat: 0,
+        imgDetailList: [],
         goodsStatusList: [
           {
             id: 1,
@@ -251,11 +268,18 @@
         this.goodsSpecialId = this.detail.goodsSpecialId
         this.goodsStatus = this.detail.goodsStatus
         this.tableData = this.detail.imageList
-        this.description = this.detail.description
+        this.description = this.detail.description.split(',')
         this.oldCoverUrl = this.detail.description
       }
     },
     methods: {
+      listBefore (file) {
+        lrz(file).then(res => {
+          console.log(res)
+          this.$refs.listUpload.post(res.file)
+        })
+        return false
+      },
       imgListSuccess (data) {
         this.tableData.push({
           imageName: data.data,
@@ -263,8 +287,17 @@
           showIndex: 0
         })
       },
-      detailSuccess (data) {
-        this.description = 'https://www.topasst.com/images/' + data.data
+      detailBefore (file) {
+
+        lrz(file).then(res => {
+          console.log(res)
+          console.log(this.$refs.detailUpload)
+          this.$refs.detailUpload.post(res.file)
+        })
+        return false
+      },
+      imgDetailSuccess (data) {
+        this.description.push('https://www.topasst.com/images/' + data.data)
       },
       returnData () {
         if (this.goodsName === '') {
@@ -307,7 +340,7 @@
           this.warningInfo('请上传缩略图')
           return false
         }
-        if (this.description === '') {
+        if (this.description.toString() === '') {
           this.warningInfo('请上传详情图片')
           return false
         }
@@ -319,7 +352,7 @@
           goodsName: this.goodsName,
           buyCost: this.buyCost,
           goodsStatus: this.goodsStatus,
-          description: this.description,
+          description: this.description.toString(),
           standard: this.standard,
           realPrice: this.realPrice,
           salePrice: this.salePrice,
@@ -335,5 +368,17 @@
 </script>
 
 <style lang="less" scoped>
-
+.detal-item-img-wrapper {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10px 10px 0;
+  width: 120px;
+  height: 120px;
+  background-color: #fff;
+  .detal-item-img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
 </style>
