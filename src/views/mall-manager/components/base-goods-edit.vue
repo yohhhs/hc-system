@@ -90,7 +90,10 @@
     <div class="modal-input-item">
       <p class="label"><span class="require-flag">*</span>商品详情</p>
       <div style="width: 670px">
-        <div v-for="item in description" class="detal-item-img-wrapper">
+        <div v-for="(item, index) in description" v-dragging="{ item: item, list: description, group: 'img'}" class="detal-item-img-wrapper">
+          <div v-show="!isLook" class="del-img">
+            <Icon color="#ed4014" size="30" type="md-close" @click="delImg(index)"/>
+          </div>
           <img class="detal-item-img" :src="item">
         </div>
         <!--<img v-for="item in imgDetailList" width="375" :src="item">-->
@@ -299,6 +302,9 @@
       imgDetailSuccess (data) {
         this.description.push('https://www.topasst.com/images/' + data.data)
       },
+      delImg (index) {
+        this.description.splice(index, 1)
+      },
       returnData () {
         if (this.goodsName === '') {
           this.warningInfo('商品名称')
@@ -369,6 +375,7 @@
 
 <style lang="less" scoped>
 .detal-item-img-wrapper {
+  position: relative;
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -376,6 +383,23 @@
   width: 120px;
   height: 120px;
   background-color: #fff;
+  &:hover {
+    .del-img {
+      display: flex;
+    }
+  }
+  .del-img {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    right: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    display: none;
+  }
   .detal-item-img {
     max-width: 100%;
     max-height: 100%;
