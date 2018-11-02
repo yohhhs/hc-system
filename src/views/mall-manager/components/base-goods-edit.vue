@@ -383,6 +383,7 @@
   width: 120px;
   height: 120px;
   background-color: #fff;
+  border: 1px solid #ddd;
   &:hover {
     .del-img {
       display: flex;
@@ -399,10 +400,18 @@
     background-color: rgba(0, 0, 0, 0.35);
     cursor: pointer;
     display: none;
+    z-index: 3;
   }
   .detal-item-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
     max-width: 100%;
     max-height: 100%;
+    z-index: 1;
   }
 }
 </style>
