@@ -291,7 +291,6 @@
         })
       },
       detailBefore (file) {
-
         lrz(file).then(res => {
           console.log(res)
           console.log(this.$refs.detailUpload)
