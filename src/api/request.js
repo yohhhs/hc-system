@@ -343,6 +343,24 @@ export const deleteManagerMemberArea = params => {
 export const getManagerMemberAreaList = params => {
   return instance.post('/managerMemberArea/getManagerMemberAreaList', params)
 }
+// 获取商品相关订单统计
+export const getGoodsAndOrderCount = params => {
+  return instance.post('/finance/getGoodsAndOrderCount', params)
+}
+// 获取用户及下单量统计
+export const getMemberAndOrderCount = params => {
+  return instance.post('/finance/getMemberAndOrderCount', params)
+}
+// 根据日期时间统计订单数量
+export const getOrderCountByDate = params => {
+  return instance.post('/finance/getOrderCountByDate', params)
+}
+
+export const home = {
+  getGoodsAndOrderCount,
+  getMemberAndOrderCount,
+  getOrderCountByDate
+}
 export const areaEdit = {
   addManagerMemberArea,
   deleteManagerMemberArea,
