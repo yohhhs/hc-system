@@ -57,10 +57,20 @@
         </div>
       </li>
     </ul>
+    <div class="order-count-wrapper">
+      <order-count></order-count>
+      <order-count :dateType="2"></order-count>
+      <order-count :dateType="3"></order-count>
+      <order-count :dateType="4"></order-count>
+    </div>
+    <Table :columns="tableColumns" :loading="tableLoading" :data="tableData"></Table>
   </div>
 </template>
 <script>
+  import orderCount from './components/order-count'
   import {home} from '@/api/request'
+  import Big from 'big.js'
+  import { table } from '@/common/js/mixins'
 
   export default {
     data() {
@@ -71,20 +81,97 @@
           noOrderMemberCount: 0,
           oneOrderMemberCount: 0,
           passTwoOrderMemberCount: 0
-        }
+        },
+        tableColumns: [
+          {
+            title: '商品名称',
+            key: 'goodsName'
+          },
+          {
+            title: '累计订单量',
+            key: 'totalOrderCount'
+          },
+          {
+            title: '累计销售额',
+            key: 'totalMoney'
+          },
+          {
+            title: '购物车收藏量',
+            key: 'shoppingCartCount'
+          },
+          {
+            title: '未支付',
+            key: 'orderCount1'
+          },
+          {
+            title: '待发货',
+            key: 'orderCount2'
+          },
+          {
+            title: '备货中',
+            key: 'orderCount5'
+          },
+          {
+            title: '待收货',
+            key: 'orderCount3'
+          },
+          {
+            title: '已完成',
+            key: 'orderCount4'
+          }
+        ]
       }
     },
+    components: {
+      orderCount
+    },
+    mixins: [table],
     created() {
-      this.getOrderCount()
+      this.getMallCount()
+      this.getGoodsList()
     },
     methods: {
-      getOrderCount() {
+      getMallCount () {
         home.getMemberAndOrderCount().then(data => {
           if (data !== 'isError') {
             for (let k in this.topData) {
               this.topData[k] = data[k]
             }
           }
+        })
+      },
+      getGoodsList () {
+        this.openTableLoading()
+        home.getGoodsAndOrderCount().then(data => {
+          this.closeTableLoading()
+          if (data !== 'isError') {
+            let footerData = {
+              goodsName: '合计',
+              totalOrderCount: 0,
+              totalMoney: new Big(0),
+              shoppingCartCount: 0,
+              orderCount1: 0,
+              orderCount2: 0,
+              orderCount5: 0,
+              orderCount3: 0,
+              orderCount4: 0
+            }
+            data.forEach(item => {
+              for (let k in item) {
+                item[k] = item[k] ? item[k] : 0
+                if (k === 'totalMoney') {
+                  footerData[k] = footerData[k].plus(item[k])
+                } else if (k !== 'goodsName') {
+                  footerData[k] += item[k]
+                }
+              }
+            })
+            footerData.totalMoney *= 1
+            data.push(footerData)
+            this.tableData = data
+          }
+        }).catch(err => {
+          this.closeTableLoading()
         })
       }
     }
@@ -133,5 +220,11 @@
         font-size: 14px;
       }
     }
+  }
+  .order-count-wrapper {
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
 </style>
